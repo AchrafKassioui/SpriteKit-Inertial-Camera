@@ -10,7 +10,7 @@ The camera simulates inertia when you let go : at the end of each gesture, the v
 
 ## Screen recording
 
-<video src="Images/SpriteKit-Inertial-Camera-Demo-compressed.mp4" width="320"></video>
+<video src="Images/SpriteKit-Inertial-Camera-Demo-Compressed.mp4" width="320"></video>
 
 ## Setup
 
