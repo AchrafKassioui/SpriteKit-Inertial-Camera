@@ -1,9 +1,13 @@
-//
-//  SpriteKit_Inertial_CameraApp.swift
-//  SpriteKit-Inertial-Camera
-//
-//  Created by Achraf Kassioui on 9/4/2024.
-//
+/**
+ 
+ # App entry point
+ 
+ Achraf Kassioui
+ Created: 9 April 2024
+ Updated: 9 April 2024
+ 
+ */
+
 
 import SwiftUI
 
@@ -11,7 +15,7 @@ import SwiftUI
 struct SpriteKit_Inertial_CameraApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CameraDemoView()
         }
     }
 }
