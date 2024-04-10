@@ -65,6 +65,11 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     var enableScaleInertia = true
     var enableRotationInertia = true
     
+    /// inertia state
+    var cameraPositionVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
+    var cameraScaleVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
+    var cameraRotationVelocity: CGFloat = 0
+    
     /// inertia settings. Values between 0 and 1
     /// lower values = higher friction.
     /// values more than 1 accelerate exponentially. Negative values are unstable.
@@ -90,9 +95,29 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         }
     }
     
-    var lockPan = false
-    var lockPinch = false
-    var lockRotation = false
+    var lockPan = false {
+        didSet {
+            if lockPan == true {
+                cameraPositionVelocity = (0.0, 0.0)
+            }
+        }
+    }
+    
+    var lockScale = false {
+        didSet {
+            if lockScale == true {
+                cameraScaleVelocity = (0.0, 0.0)
+            }
+        }
+    }
+    
+    var lockRotation = false {
+        didSet {
+            if lockRotation == true {
+                cameraRotationVelocity = 0
+            }
+        }
+    }
     
     // MARK: - Initialization
     /**
@@ -184,9 +209,9 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     /// pan state
     private var cameraPositionBeforePan = CGPoint.zero
-    private var cameraPositionVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
     
     @objc private func panCamera(gesture: UIPanGestureRecognizer) {
+        if lockPan { return }
         if gesture.state == .began {
             
             /// store the camera's position at the beginning of the pan gesture
@@ -242,9 +267,9 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     /// zoom state
     private var cameraScaleBeforePinch: (x: CGFloat, y: CGFloat) = (1, 1)
     private var cameraPositionBeforePinch = CGPoint.zero
-    private var cameraScaleVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
     
     @objc private func scaleCamera(gesture: UIPinchGestureRecognizer) {
+        if lockScale { return }
         guard let scene = theScene else { return }
         let scaleCenterInView = gesture.location(in: theView)
         let scaleCenterInScene = scene.convertPoint(fromView: scaleCenterInView)
@@ -296,13 +321,13 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     // MARK: Rotate
     
     /// rotation state
-    private var cameraRotationBeforeRotate: CGFloat = 0
     private var cameraPositionBeforeRotate = CGPoint.zero
+    private var cameraRotationBeforeRotate: CGFloat = 0
     private var cumulativeRotation: CGFloat = 0
     private var rotationPivot = CGPoint.zero
-    private var cameraRotationVelocity: CGFloat = 0
     
     @objc private func rotateCamera(gesture: UIRotationGestureRecognizer) {
+        if lockRotation { return }
         guard let scene = theScene else { return }
         let midpointInView = gesture.location(in: theView)
         let midpointInScene = scene.convertPoint(fromView: midpointInView)
@@ -359,27 +384,6 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     func updateInertia() {
         
-        /// reduce the load by checking the current scale velocity first
-        if (enableScaleInertia && (cameraScaleVelocity.x != 0 || cameraScaleVelocity.y != 0)) {
-            /// Apply friction to velocity so the camera slows to a stop when user interaction ends.
-            cameraScaleVelocity.x *= scaleInertia
-            cameraScaleVelocity.y *= scaleInertia
-            
-            /// Stop the camera when velocity has approached close enough to zero
-            if (abs(cameraScaleVelocity.x) < 0.001) { cameraScaleVelocity.x = 0 }
-            if (abs(cameraScaleVelocity.y) < 0.001) { cameraScaleVelocity.y = 0 }
-            
-            let newXScale = self.xScale - cameraScaleVelocity.x
-            let newYScale = self.yScale - cameraScaleVelocity.y
-            
-            /// prevent the inertial zooming from exceeding the zoom limits
-            let clampedXScale = max(min(newXScale, maxScale), minScale)
-            let clampedYScale = max(min(newYScale, maxScale), minScale)
-            
-            self.xScale = clampedXScale
-            self.yScale = clampedYScale
-        }
-        
         /// reduce the load by checking the current position velocity first
         if (enablePanInertia && (cameraPositionVelocity.x != 0 || cameraPositionVelocity.y != 0)) {
             /// apply friction to velocity
@@ -401,6 +405,27 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         }
         
         /// reduce the load by checking the current scale velocity first
+        if (enableScaleInertia && (cameraScaleVelocity.x != 0 || cameraScaleVelocity.y != 0)) {
+            /// Apply friction to velocity so the camera slows to a stop when user interaction ends.
+            cameraScaleVelocity.x *= scaleInertia
+            cameraScaleVelocity.y *= scaleInertia
+            
+            /// Stop the camera when velocity has approached close enough to zero
+            if (abs(cameraScaleVelocity.x) < 0.001) { cameraScaleVelocity.x = 0 }
+            if (abs(cameraScaleVelocity.y) < 0.001) { cameraScaleVelocity.y = 0 }
+            
+            let newXScale = self.xScale - cameraScaleVelocity.x
+            let newYScale = self.yScale - cameraScaleVelocity.y
+            
+            /// prevent the inertial zooming from exceeding the zoom limits
+            let clampedXScale = max(min(newXScale, maxScale), minScale)
+            let clampedYScale = max(min(newYScale, maxScale), minScale)
+            
+            self.xScale = clampedXScale
+            self.yScale = clampedYScale
+        }
+        
+        /// reduce the load by checking the current scale velocity first
         if (enableRotationInertia && cameraRotationVelocity != 0) {
             /// Apply friction to velocity so the camera slows to a stop when user interaction ends
             cameraRotationVelocity *= rotationInertia
@@ -416,8 +441,8 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     /// this function is called to stop any ongoing camera inertia
     func stopInertia() {
-        cameraScaleVelocity = (0.0, 0.0)
         cameraPositionVelocity = (0.0, 0.0)
+        cameraScaleVelocity = (0.0, 0.0)
         cameraRotationVelocity = 0
     }
     

@@ -102,6 +102,7 @@ class CameraDemoScene: SKScene, UIGestureRecognizerDelegate {
         /// create UI
         createResetCameraButton(with: view)
         createCameraLockButton(with: view)
+        createLockRotationButton(with: view)
     }
     
     // MARK: UI
@@ -109,41 +110,64 @@ class CameraDemoScene: SKScene, UIGestureRecognizerDelegate {
     let spacing: CGFloat = 20
     let buttonSize = CGSize(width: 140, height: 50)
     
+    /// lock camera rotation
+    func createLockRotationButton(with view: SKView) {
+        let button = ButtonWithIconAndPattern(
+            size: buttonSize,
+            labelBase: "Lock Rotation",
+            labelActive: "Unlock Rotation",
+            onTouch: toggleCameraRotation
+        )
+        
+        button.position = CGPoint(
+            x: -80,
+            y: -280
+        )
+        
+        camera?.addChild(button)
+    }
+    
     /// lock camera
     func createCameraLockButton(with view: SKView) {
-        let lockCameraButton = ButtonWithIconAndPattern(
+        let button = ButtonWithIconAndPattern(
             size: buttonSize,
             labelBase: "Lock Camera",
             labelActive: "Unlock Camera",
             onTouch: toggleCameraLock
         )
         
-        lockCameraButton.position = CGPoint(
+        button.position = CGPoint(
             x: -80,
             y: -view.frame.height/2 + view.safeAreaInsets.bottom + buttonSize.height/2 + spacing
         )
         
-        camera?.addChild(lockCameraButton)
+        camera?.addChild(button)
     }
     
     /// reset camera and sprite
     func createResetCameraButton(with view: SKView) {
-        let resetCameraButton = ButtonWithIconAndPattern(
+        let button = ButtonWithIconAndPattern(
             size: buttonSize,
             labelBase: "Reset Camera",
             labelActive: "Reset Camera",
-            onTouch: resetCameraAndSprite
+            onTouch: resetCamera
         )
         
-        resetCameraButton.position = CGPoint(
+        button.position = CGPoint(
             x: 80,
             y: -view.frame.height/2 + view.safeAreaInsets.bottom + buttonSize.height/2 + spacing
         )
         
-        camera?.addChild(resetCameraButton)
+        camera?.addChild(button)
     }
     
     // MARK: Methods
+    
+    func toggleCameraRotation() {
+        if let myCamera = self.camera as? InertialCamera {
+            myCamera.lockRotation.toggle()
+        }
+    }
     
     func toggleCameraLock() {
         if let myCamera = self.camera as? InertialCamera {
@@ -151,7 +175,7 @@ class CameraDemoScene: SKScene, UIGestureRecognizerDelegate {
         }
     }
     
-    func resetCameraAndSprite(){
+    func resetCamera(){
         if let inertialCamera = self.camera as? InertialCamera {
             inertialCamera.stopInertia()
             inertialCamera.setCameraTo(

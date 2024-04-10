@@ -39,6 +39,8 @@ override func update(_ currentTime: TimeInterval) {
 
 ## Configuration
 
+The camera settings can be changed dynamically to suit your UX requirements.
+
 ### Inertia
 
 Selectively enable or disable inertia for each transformation:
@@ -53,6 +55,9 @@ Tweak the friction values of the inertia:
 
 ```swift
 /// lower values = higher friction
+/// a value of 1 will maintain the velocity indefinitely
+/// values above 1 will accelerate exponentially
+/// values below 1 are unstable
 inertialCamera.positionInertia = 0.95
 inertialCamera.scaleInertia = 0.75
 inertialCamera.rotationInertia = 0.85
@@ -71,11 +76,18 @@ inertialCamera.minScale = 0.01
 
 ### Lock
 
-You can lock the camera. The lock disables the gesture recognition. In your own logic, you can dynamically control the lock to restrict the camera controls to a specific button or area. When locked, any ongoing inertia is halted.
+Selectively lock each transformation, or all of them. A full lock effectively disables the gesture recognizers set up with the camera.
 
 ```swift
+inertialCamera.lockPan = false
+inertialCamera.lockScale = false
+inertialCamera.lockRotation = false
+
+/// full lock
 inertialCamera.lock = false
 ```
+
+When reset, a lock set to zero the velocity of the corresponding transformation. The inertia simulation will stop.
 
 ### Adaptive filtering
 
