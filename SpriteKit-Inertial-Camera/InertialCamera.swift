@@ -68,13 +68,13 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     /// inertia settings. Values between 0 and 1
     /// lower values = higher friction.
     /// values more than 1 accelerate exponentially. Negative values are unstable.
-    var cameraPositionInertia: CGFloat = 0.95 /// default 0.95
-    var cameraScaleInertia: CGFloat = 0.75 /// default 0.75
-    var cameraRotationInertia: CGFloat = 0.85 /// 0.85
+    var positionInertia: CGFloat = 0.95 /// default 0.95
+    var scaleInertia: CGFloat = 0.75 /// default 0.75
+    var rotationInertia: CGFloat = 0.85 /// 0.85
     
     /// zoom settings
-    var cameraMaxScale: CGFloat = 100 /// a max zoom out of 0.01x
-    var cameraMinScale: CGFloat = 0.01 /// a max zoom in of 100x
+    var maxScale: CGFloat = 100 /// a max zoom out of 0.01x
+    var minScale: CGFloat = 0.01 /// a max zoom in of 100x
     
     /// adaptive filtering
     var adaptiveFiltering = true
@@ -262,8 +262,8 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
             let newYScale = (self.yScale / gesture.scale)
             
             /// limit the resulting scale within a range
-            let clampedXScale = max(min(newXScale, cameraMaxScale), cameraMinScale)
-            let clampedYScale = max(min(newYScale, cameraMaxScale), cameraMinScale)
+            let clampedXScale = max(min(newXScale, maxScale), minScale)
+            let clampedYScale = max(min(newYScale, maxScale), minScale)
             
             /// calculate a factor to move the camera toward the pinch midpoint
             let xTranslationFactor = clampedXScale / self.xScale
@@ -362,8 +362,8 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         /// reduce the load by checking the current scale velocity first
         if (enableScaleInertia && (cameraScaleVelocity.x != 0 || cameraScaleVelocity.y != 0)) {
             /// Apply friction to velocity so the camera slows to a stop when user interaction ends.
-            cameraScaleVelocity.x *= cameraScaleInertia
-            cameraScaleVelocity.y *= cameraScaleInertia
+            cameraScaleVelocity.x *= scaleInertia
+            cameraScaleVelocity.y *= scaleInertia
             
             /// Stop the camera when velocity has approached close enough to zero
             if (abs(cameraScaleVelocity.x) < 0.001) { cameraScaleVelocity.x = 0 }
@@ -373,8 +373,8 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
             let newYScale = self.yScale - cameraScaleVelocity.y
             
             /// prevent the inertial zooming from exceeding the zoom limits
-            let clampedXScale = max(min(newXScale, cameraMaxScale), cameraMinScale)
-            let clampedYScale = max(min(newYScale, cameraMaxScale), cameraMinScale)
+            let clampedXScale = max(min(newXScale, maxScale), minScale)
+            let clampedYScale = max(min(newYScale, maxScale), minScale)
             
             self.xScale = clampedXScale
             self.yScale = clampedYScale
@@ -383,8 +383,8 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         /// reduce the load by checking the current position velocity first
         if (enablePanInertia && (cameraPositionVelocity.x != 0 || cameraPositionVelocity.y != 0)) {
             /// apply friction to velocity
-            cameraPositionVelocity.x *= cameraPositionInertia
-            cameraPositionVelocity.y *= cameraPositionInertia
+            cameraPositionVelocity.x *= positionInertia
+            cameraPositionVelocity.y *= positionInertia
             
             /// calculate the rotated velocity to account for camera rotation
             let angle = self.zRotation
@@ -403,7 +403,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         /// reduce the load by checking the current scale velocity first
         if (enableRotationInertia && cameraRotationVelocity != 0) {
             /// Apply friction to velocity so the camera slows to a stop when user interaction ends
-            cameraRotationVelocity *= cameraRotationInertia
+            cameraRotationVelocity *= rotationInertia
             
             /// Stop the camera when velocity has approached close enough to zero
             if (abs(cameraRotationVelocity) < 0.01) {
