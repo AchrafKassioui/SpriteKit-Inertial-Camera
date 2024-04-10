@@ -17,7 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DEB875152BC5EFC500A21BCB /* SpriteKit-Inertial-Camera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "SpriteKit-Inertial-Camera.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DEB875152BC5EFC500A21BCB /* Inertial Camera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Inertial Camera.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEB875182BC5EFC500A21BCB /* SpriteKit_Inertial_CameraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKit_Inertial_CameraApp.swift; sourceTree = "<group>"; };
 		DEB8751A2BC5EFC500A21BCB /* CameraDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraDemo.swift; sourceTree = "<group>"; };
 		DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -52,7 +52,7 @@
 		DEB875162BC5EFC500A21BCB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				DEB875152BC5EFC500A21BCB /* SpriteKit-Inertial-Camera.app */,
+				DEB875152BC5EFC500A21BCB /* Inertial Camera.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,9 +89,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		DEB875142BC5EFC500A21BCB /* SpriteKit-Inertial-Camera */ = {
+		DEB875142BC5EFC500A21BCB /* Inertial Camera */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = DEB875232BC5EFC700A21BCB /* Build configuration list for PBXNativeTarget "SpriteKit-Inertial-Camera" */;
+			buildConfigurationList = DEB875232BC5EFC700A21BCB /* Build configuration list for PBXNativeTarget "Inertial Camera" */;
 			buildPhases = (
 				DEB875112BC5EFC500A21BCB /* Sources */,
 				DEB875122BC5EFC500A21BCB /* Frameworks */,
@@ -101,9 +101,9 @@
 			);
 			dependencies = (
 			);
-			name = "SpriteKit-Inertial-Camera";
+			name = "Inertial Camera";
 			productName = "SpriteKit-Inertial-Camera";
-			productReference = DEB875152BC5EFC500A21BCB /* SpriteKit-Inertial-Camera.app */;
+			productReference = DEB875152BC5EFC500A21BCB /* Inertial Camera.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -121,7 +121,7 @@
 					};
 				};
 			};
-			buildConfigurationList = DEB875102BC5EFC500A21BCB /* Build configuration list for PBXProject "SpriteKit-Inertial-Camera" */;
+			buildConfigurationList = DEB875102BC5EFC500A21BCB /* Build configuration list for PBXProject "Inertial Camera" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -134,7 +134,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				DEB875142BC5EFC500A21BCB /* SpriteKit-Inertial-Camera */,
+				DEB875142BC5EFC500A21BCB /* Inertial Camera */,
 			);
 		};
 /* End PBXProject section */
@@ -219,7 +219,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -276,7 +276,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -349,7 +349,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		DEB875102BC5EFC500A21BCB /* Build configuration list for PBXProject "SpriteKit-Inertial-Camera" */ = {
+		DEB875102BC5EFC500A21BCB /* Build configuration list for PBXProject "Inertial Camera" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DEB875212BC5EFC700A21BCB /* Debug */,
@@ -358,7 +358,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		DEB875232BC5EFC700A21BCB /* Build configuration list for PBXNativeTarget "SpriteKit-Inertial-Camera" */ = {
+		DEB875232BC5EFC700A21BCB /* Build configuration list for PBXNativeTarget "Inertial Camera" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				DEB875242BC5EFC700A21BCB /* Debug */,

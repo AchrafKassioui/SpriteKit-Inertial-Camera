@@ -4,7 +4,7 @@
  
  Achraf Kassioui
  Created: 9 April 2024
- Updated: 9 April 2024
+ Updated: 10 April 2024
  
  */
 
@@ -44,6 +44,7 @@ class CameraDemoScene: SKScene, UIGestureRecognizerDelegate {
         scaleMode = .resizeFill
         backgroundColor = SKColor(red: 0.89, green: 0.89, blue: 0.84, alpha: 1)
         
+        /// setup scene physics
         physicsWorld.gravity = CGVector(dx: 0, dy: -9.8)
         physicsWorld.speed = 1
         let physicsBoundaries = CGRect(
@@ -55,26 +56,12 @@ class CameraDemoScene: SKScene, UIGestureRecognizerDelegate {
         physicsBody = SKPhysicsBody(edgeLoopFrom: physicsBoundaries)
         physicsBody?.restitution = 1
         
-        /// create objects
-        sprite = SKSpriteNode(color: .systemRed, size: CGSize(width: 60, height: 60))
-        sprite.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 60, height: 60))
-        sprite.physicsBody?.restitution = 1.01
-        sprite.physicsBody?.linearDamping = 0
-        sprite.zPosition = 10
-        sprite.position.y = 300
-        sprite.zRotation = .pi * 0.2
-        addChild(sprite)
-        
+        /// create background
         if let gridTexture = generateGridTexture(cellSize: 60, rows: 20, cols: 20, color: SKColor(white: 0, alpha: 0.15)) {
             let gridbackground = SKSpriteNode(texture: gridTexture)
             gridbackground.zPosition = -1
             addChild(gridbackground)
         }
-        
-        let viewFrame = SKShapeNode(rectOf: CGSize(width: view.frame.width, height: view.frame.height))
-        viewFrame.lineWidth = 3
-        viewFrame.strokeColor = SKColor(white: 0, alpha: 0.9)
-        addChild(viewFrame)
         
         let yAxis = SKShapeNode(rectOf: CGSize(width: 1, height: 100000))
         yAxis.strokeColor = SKColor(white: 0, alpha: 0.1)
@@ -84,6 +71,23 @@ class CameraDemoScene: SKScene, UIGestureRecognizerDelegate {
         xAxis.isAntialiased = false
         xAxis.strokeColor = SKColor(white: 0, alpha: 0.1)
         addChild(xAxis)
+        
+        /// create view frame
+        let viewFrame = SKShapeNode(rectOf: CGSize(width: view.frame.width, height: view.frame.height))
+        viewFrame.lineWidth = 3
+        viewFrame.strokeColor = SKColor(white: 0, alpha: 0.9)
+        addChild(viewFrame)
+        
+        /// create sprite
+        sprite = SKSpriteNode(color: .systemRed, size: CGSize(width: 60, height: 60))
+        sprite.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 60, height: 60))
+        sprite.physicsBody?.restitution = 1.01
+        sprite.physicsBody?.linearDamping = 0
+        sprite.physicsBody?.angularDamping = 0
+        sprite.zPosition = 10
+        sprite.position.y = 300
+        sprite.zRotation = .pi * 0.2
+        addChild(sprite)
         
         /// create camera
         let inertialCamera = InertialCamera(view: view, scene: self)

@@ -90,6 +90,10 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         }
     }
     
+    var lockPan = false
+    var lockPinch = false
+    var lockRotation = false
+    
     // MARK: - Initialization
     /**
      

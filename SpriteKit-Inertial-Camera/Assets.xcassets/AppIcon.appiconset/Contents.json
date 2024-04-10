@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "SpriteKit-Inertial-Camera-Icon.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
