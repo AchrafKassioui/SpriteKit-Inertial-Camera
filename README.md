@@ -51,7 +51,7 @@ inertialCamera.enableScaleInertia = true
 inertialCamera.enableRotationInertia = true
 ```
 
-Tweak the friction values of the inertia:
+Tweak the friction values:
 
 ```swift
 /// lower values = higher friction
