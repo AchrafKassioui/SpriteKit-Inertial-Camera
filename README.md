@@ -1,4 +1,4 @@
-<img src="Images/SpriteKit-Inertial-Camera-Icon.png" alt="SpriteKit-Inertial-Camera-Icon" style="width:25%;" />
+<img src="Images/SpriteKit-Inertial-Camera-Icon-Alpha.png" alt="SpriteKit-Inertial-Camera-Icon" style="width:25%;" />
 
 #  SpriteKit Inertial Camera
 
