@@ -87,7 +87,11 @@ This is an opinionated feature. When the camera is zoomed in, I want to see the 
 inertialCamera.adaptiveFiltering = true
 ```
 
-## Support
+## Compatibility
 
-Tested on iOS. Not adapted for macOS yet.
+Developed with Xcode 15.4 and iOS 17.4.1. On macOS, the panning works, but pinch and rotation require further work for the desktop input devices.
+
+## Credits
+
+This project started as a fork of [SKCamera-Demo](https://github.com/HumboldtCodeClub/SKCamera-Demo). Thank you @HumboldtCodeClub for sharing your findings.
 
