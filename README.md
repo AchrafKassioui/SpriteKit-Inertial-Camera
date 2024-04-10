@@ -1,3 +1,5 @@
+<img src="Images/SpriteKit-Inertial-Camera-Icon.png" alt="SpriteKit-Inertial-Camera-Icon" style="zoom:25%;" />
+
 #  SpriteKit Inertial Camera
 
 This is a custom camera for SpriteKit that allows you to freely navigate around the scene.
