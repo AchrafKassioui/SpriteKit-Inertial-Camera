@@ -6,15 +6,15 @@ This is a custom camera for SpriteKit that allows you to freely navigate around 
 You can use pan, pinch, and rotation gestures to control the camera.
 When the gesture ends, the camera maintain the velocity of the gesture and gradually slows it down over time.
 
-## Screenshots
-
-<img src="Images/SpriteKit-Inertial-Camera-Screenshots.png" alt="SpriteKit-Inertial-Camera-Screenshots" style="width:100%;" />
-
 ## Screen recording
 
 A GIF (7.3MB, 10fps) is attached below. [Higher quality screen recording](https://www.achrafkassioui.com/images/SpriteKit-Inertial-Camera-Demo.mp4) (18MB).
 
 <img src="Images/SpriteKit-Inertial-Camera-Demo-Compressed.gif" alt="SpriteKit-Inertial-Camera-Demo-Compressed" />
+
+## Screenshots
+
+<img src="Images/SpriteKit-Inertial-Camera-Screenshots.png" alt="SpriteKit-Inertial-Camera-Screenshots" style="width:100%;" />
 
 ## Setup
 
