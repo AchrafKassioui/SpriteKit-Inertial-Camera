@@ -2,11 +2,9 @@
 
 #  SpriteKit Inertial Camera
 
-This is a custom camera for SpriteKit that allows you to freely navigate around the scene.
-You can use pan, pinch, and rotation gestures to control the camera.
-When the gesture ends, the camera maintain the velocity of the gesture and gradually slows it down over time.
+This is a camera for SpriteKit that allows you to navigate around the scene using multi-touch gestures. You can pan, pinch, and rotate to control the camera. When a gesture ends, the camera maintain the velocity of the transformation then gradually slows it down over time.
 
-## Screen recording
+## Video
 
 A GIF (7.3MB, 10fps) is attached below. [Higher quality screen recording](https://www.achrafkassioui.com/images/SpriteKit-Inertial-Camera-Demo.mp4) (18MB).
 
@@ -18,7 +16,7 @@ A GIF (7.3MB, 10fps) is attached below. [Higher quality screen recording](https:
 
 ## Setup
 
-Add the `InertialCamera` file or class to your project, then create an instance of the camera, for example inside `didMove`:
+Add the `InertialCamera` file or class to your project, then create an instance of the camera and set it as the scene camera, for example inside `didMove`:
 
 ```swift
 override func didMove(to view: SKView) {
@@ -29,7 +27,7 @@ override func didMove(to view: SKView) {
 }
 ```
 
-In order to enable inertia, the `updateInertia` method of the camera can be called inside the `update` function of the scene:
+In order to enable inertia, the `updateInertia()` method of `InertialCamera` can be called inside the `update` loop of the scene:
 
 ```swift
 override func update(_ currentTime: TimeInterval) {
@@ -40,6 +38,8 @@ override func update(_ currentTime: TimeInterval) {
 ```
 
 ## Configuration
+
+### Inertia
 
 Selectively enable or disable inertia for each transformation:
 
@@ -52,11 +52,13 @@ inertialCamera.enableRotationInertia = true
 Tweak the friction values of the inertia:
 
 ```swift
-/// lower values = higher friction.
+/// lower values = higher friction
 inertialCamera.positionInertia = 0.95
 inertialCamera.scaleInertia = 0.75
 inertialCamera.rotationInertia = 0.85
 ```
+
+### Zoom
 
 Set the minimum and maximum zoom levels:
 
@@ -67,7 +69,23 @@ inertialCamera.maxScale = 100
 inertialCamera.minScale = 0.01
 ```
 
+### Lock
 
+You can lock the camera. The lock disables the gesture recognition. In your own logic, you can dynamically control the lock to restrict the camera controls to a specific button or area. When locked, any ongoing inertia is halted.
+
+```swift
+inertialCamera.lock = false
+```
+
+### Adaptive filtering
+
+Change the filtering mode of textures depending on camera zoom. When the scale is below 1 (zoom in) on either x or y, linear filtering on `SKSpriteNode` and anti-aliasing on `SKShapeNode` are disabled. When the scale is 1 or above (zoom out) on either x and y, linear filtering and anti aliasing are enabled (the default renderer behavior).
+
+This is an opinionated feature. When the camera is zoomed in, I want to see the pixel grid, not a blur. This behavior can be toggled.
+
+```swift
+inertialCamera.adaptiveFiltering = true
+```
 
 ## Support
 
