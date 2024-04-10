@@ -2,7 +2,7 @@
 
 #  SpriteKit Inertial Camera
 
-This is a camera for SpriteKit that allows you to navigate around the scene using multi-touch gestures. You can pan, pinch, and rotate to control the camera. When a gesture ends, the camera maintain the velocity of the transformation then gradually slows it down over time.
+This is a camera for SpriteKit that allows you to navigate around the scene using multi-touch gestures. You can pan, pinch, and rotate to control the camera. When a gesture ends, the camera maintain the velocity of its transformations then gradually slows them down over time.
 
 ## Video
 
