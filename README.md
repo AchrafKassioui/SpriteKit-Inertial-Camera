@@ -6,11 +6,11 @@ This custom SpriteKit camera allows you to navigate around the scene using multi
 
 ## Video
 
-[Higher quality screen recording](https://www.achrafkassioui.com/images/SpriteKit-Inertial-Camera-Demo.mp4) (18MB).
+*Coming soon...*
 
 ## Screenshots
 
-
+*Coming soon...*
 
 ## Setup
 

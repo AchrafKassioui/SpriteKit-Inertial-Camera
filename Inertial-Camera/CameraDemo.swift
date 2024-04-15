@@ -309,7 +309,6 @@ class GestureVisualizer: SKNode, UIGestureRecognizerDelegate {
     
     /// variables
     private var gestureVisualizationNodes: [String: SKShapeNode] = [:]
-    private let circleRadius: CGFloat = 22
     private let myFontName: String = "GillSans-SemiBold"
     private let myFontColor = SKColor(white: 0, alpha: 0.8)
     private let myStrokeColor = SKColor(white: 1, alpha: 0.8)
@@ -387,7 +386,7 @@ class GestureVisualizer: SKNode, UIGestureRecognizerDelegate {
             for i in 0..<2 {
                 let touchLocationInView = gesture.location(ofTouch: i, in: scene.view)
                 let touchLocationInScene = scene.convertPoint(fromView: touchLocationInView)
-                updateOrCreateMultiTouchNodes(name: "pinch-touch-\(i)", position: touchLocationInScene, color: .systemBlue)
+                updateOrCreateTouchNode(name: "pinch-touch-\(i)", position: touchLocationInScene, color: .systemBlue)
             }
         }
     }
@@ -402,7 +401,7 @@ class GestureVisualizer: SKNode, UIGestureRecognizerDelegate {
             for i in 0..<2 {
                 let touchLocationInView = gesture.location(ofTouch: i, in: scene.view)
                 let touchLocationInScene = scene.convertPoint(fromView: touchLocationInView)
-                updateOrCreateMultiTouchNodes(name: "rotation-touch-\(i)", position: touchLocationInScene, color: .systemBlue)
+                updateOrCreateTouchNode(name: "rotation-touch-\(i)", position: touchLocationInScene, color: .systemBlue)
             }
         }
     }
@@ -413,20 +412,10 @@ class GestureVisualizer: SKNode, UIGestureRecognizerDelegate {
             node.position = position
             adjustForCamera(node: node)
         } else {
-            let node = SKShapeNode(circleOfRadius: circleRadius)
+            let node = SKShapeNode(circleOfRadius: 2)
             
-            /*
-            let path = CGMutablePath()
-            path.move(to: CGPoint(x: -10, y: 0))
-            path.addLine(to: CGPoint(x: 10, y: 0))
-            path.move(to: CGPoint(x: 0, y: 10))
-            path.addLine(to: CGPoint(x: 0, y: -10))
-            
-            node.path = path
-             */
-            
-            node.fillColor = color
-            node.strokeColor = myStrokeColor
+            //node.fillColor = color
+            node.strokeColor = .systemBlue
             node.name = name
             node.zPosition = 9999
             node.position = position
@@ -455,18 +444,18 @@ class GestureVisualizer: SKNode, UIGestureRecognizerDelegate {
                 label.position = CGPoint(x: -20, y: -20)
             }
             
-            node.addChild(label)
+            //node.addChild(label)
             
             gestureVisualizationNodes[name] = node
         }
     }
     
-    private func updateOrCreateMultiTouchNodes(name: String, position: CGPoint, color: SKColor) {
+    private func updateOrCreateTouchNode(name: String, position: CGPoint, color: SKColor) {
         if let node = gestureVisualizationNodes[name] {
             node.position = position
             adjustForCamera(node: node)
         } else {
-            let node = SKShapeNode(circleOfRadius: circleRadius)
+            let node = SKShapeNode(circleOfRadius: 22)
             node.name = name
             node.fillColor = color
             node.strokeColor = myStrokeColor
@@ -474,16 +463,6 @@ class GestureVisualizer: SKNode, UIGestureRecognizerDelegate {
             node.position = position
             adjustForCamera(node: node)
             addChild(node)
-            
-            let label = SKLabelNode(text: name)
-            label.fontName = myFontName
-            label.fontColor = myFontColor
-            label.fontSize = 12
-            label.preferredMaxLayoutWidth = 60
-            label.numberOfLines = 0
-            label.verticalAlignmentMode = .center
-            /// add the label to display the touch number
-            //node.addChild(label)
             
             gestureVisualizationNodes[name] = node
         }
