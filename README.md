@@ -2,17 +2,15 @@
 
 #  SpriteKit Inertial Camera
 
-This is a camera for SpriteKit that allows you to navigate around the scene using multi-touch gestures. You can pan, pinch, and rotate to control the camera. When a gesture ends, the camera maintain the velocity of its transformations then gradually slows them down over time.
+This custom SpriteKit camera allows you to navigate around the scene using multi-touch gestures. You can pan, pinch, and rotate to control the camera. When a gesture ends, the camera maintain the velocity of its transformations then gradually slows them down over time.
 
 ## Video
 
-A GIF (7.3MB, 10fps) is attached below. [Higher quality screen recording](https://www.achrafkassioui.com/images/SpriteKit-Inertial-Camera-Demo.mp4) (18MB).
-
-<img src="Images/SpriteKit-Inertial-Camera-Demo-Compressed.gif" alt="SpriteKit-Inertial-Camera-Demo-Compressed" />
+[Higher quality screen recording](https://www.achrafkassioui.com/images/SpriteKit-Inertial-Camera-Demo.mp4) (18MB).
 
 ## Screenshots
 
-<img src="Images/SpriteKit-Inertial-Camera-Screenshots.png" alt="SpriteKit-Inertial-Camera-Screenshots" style="width:100%;" />
+
 
 ## Setup
 
@@ -27,7 +25,7 @@ override func didMove(to view: SKView) {
 }
 ```
 
-In order to enable inertia, the `updateInertia()` method of `InertialCamera` can be called inside the `update` loop of the scene:
+In order to enable inertia, the `updateInertia()` method of can be called inside the `update` loop of the scene:
 
 ```swift
 override func update(_ currentTime: TimeInterval) {
@@ -39,16 +37,14 @@ override func update(_ currentTime: TimeInterval) {
 
 ## Configuration
 
-The camera settings can be changed dynamically to suit your UX requirements.
-
 ### Inertia
 
 Selectively enable or disable inertia for each transformation:
 
 ```swift
-inertialCamera.enablePanInertia = true
-inertialCamera.enableScaleInertia = true
-inertialCamera.enableRotationInertia = true
+inertialCamera.enablePanInertia = true /// default
+inertialCamera.enableScaleInertia = true /// default
+inertialCamera.enableRotationInertia = true /// default
 ```
 
 Tweak the friction values:
@@ -63,6 +59,22 @@ inertialCamera.scaleInertia = 0.75
 inertialCamera.rotationInertia = 0.85
 ```
 
+Apply arbitrary values to the camera velocity:
+
+```swift
+inertialCamera.positionVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
+inertialCamera.scaleVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
+inertialCamera.rotationVelocity: CGFloat = 0.1
+```
+
+Stop all ongoing inertia. This is typically called with a `touchesBegan` event, so that the camera stops moving when the user touches the screen:
+
+```swift
+inertialCamera.stopInertia()
+```
+
+`stopInertia` is a convenience method. Under the hood, it sets to zero the current stored inertia for each transform.
+
 ### Zoom
 
 Set the minimum and maximum zoom levels:
@@ -76,7 +88,7 @@ inertialCamera.minScale = 0.01
 
 ### Lock
 
-Selectively lock each transformation, or all of them. A full lock effectively disables the gesture recognizers set up with the camera.
+Selectively lock each transformation, or all of them. A full lock disables the gesture recognizers that have been attached to the view when the camera was instantiated.
 
 ```swift
 inertialCamera.lockPan = false
@@ -101,9 +113,11 @@ inertialCamera.adaptiveFiltering = true
 
 ## Compatibility
 
-Developed with Xcode 15.4 and iOS 17.4.1. On macOS, the panning works, but pinch and rotation require further work for the desktop input devices.
+Developed with Xcode 15.4 and tested on iOS 17.4.1.
+
+On macOS, although the panning works, the controls aren't yet adapted to the trackpad, mouse, and keyboard.
 
 ## Credits
 
-This project started as a fork of [SKCamera-Demo](https://github.com/HumboldtCodeClub/SKCamera-Demo). Thank you @HumboldtCodeClub for sharing your findings.
+This project started as a fork of [SKCamera-Demo](https://github.com/HumboldtCodeClub/SKCamera-Demo). Thank you @HumboldtCodeClub for sharing and commenting your code.
 

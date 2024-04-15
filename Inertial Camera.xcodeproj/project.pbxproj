@@ -7,20 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DEB875192BC5EFC500A21BCB /* SpriteKit_Inertial_CameraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875182BC5EFC500A21BCB /* SpriteKit_Inertial_CameraApp.swift */; };
+		DEB875192BC5EFC500A21BCB /* InertialCameraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */; };
 		DEB8751B2BC5EFC500A21BCB /* CameraDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB8751A2BC5EFC500A21BCB /* CameraDemo.swift */; };
 		DEB8751D2BC5EFC700A21BCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */; };
 		DEB875272BC5EFF900A21BCB /* InertialCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875262BC5EFF900A21BCB /* InertialCamera.swift */; };
-		DEB875292BC5F00700A21BCB /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875282BC5F00700A21BCB /* Helpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DE288FB12BCA471C00A00644 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Inertial-Camera/Info.plist"; sourceTree = "<group>"; };
 		DEB875152BC5EFC500A21BCB /* Inertial Camera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Inertial Camera.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		DEB875182BC5EFC500A21BCB /* SpriteKit_Inertial_CameraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpriteKit_Inertial_CameraApp.swift; sourceTree = "<group>"; };
+		DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InertialCameraApp.swift; sourceTree = "<group>"; };
 		DEB8751A2BC5EFC500A21BCB /* CameraDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraDemo.swift; sourceTree = "<group>"; };
 		DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DEB875262BC5EFF900A21BCB /* InertialCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InertialCamera.swift; sourceTree = "<group>"; };
-		DEB875282BC5F00700A21BCB /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
 		DEB8752A2BC5FB5500A21BCB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -38,9 +37,10 @@
 		DEB8750C2BC5EFC500A21BCB = {
 			isa = PBXGroup;
 			children = (
+				DE288FB12BCA471C00A00644 /* Info.plist */,
 				DEB8752A2BC5FB5500A21BCB /* README.md */,
 				DEB8752C2BC5FE2D00A21BCB /* Images */,
-				DEB875172BC5EFC500A21BCB /* SpriteKit-Inertial-Camera */,
+				DEB875172BC5EFC500A21BCB /* Inertial-Camera */,
 				DEB875162BC5EFC500A21BCB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -53,16 +53,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		DEB875172BC5EFC500A21BCB /* SpriteKit-Inertial-Camera */ = {
+		DEB875172BC5EFC500A21BCB /* Inertial-Camera */ = {
 			isa = PBXGroup;
 			children = (
-				DEB875182BC5EFC500A21BCB /* SpriteKit_Inertial_CameraApp.swift */,
+				DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */,
 				DEB8751A2BC5EFC500A21BCB /* CameraDemo.swift */,
 				DEB875262BC5EFF900A21BCB /* InertialCamera.swift */,
-				DEB875282BC5F00700A21BCB /* Helpers.swift */,
 				DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */,
 			);
-			path = "SpriteKit-Inertial-Camera";
+			path = "Inertial-Camera";
 			sourceTree = "<group>";
 		};
 		DEB8752C2BC5FE2D00A21BCB /* Images */ = {
@@ -143,8 +142,7 @@
 			files = (
 				DEB875272BC5EFF900A21BCB /* InertialCamera.swift in Sources */,
 				DEB8751B2BC5EFC500A21BCB /* CameraDemo.swift in Sources */,
-				DEB875192BC5EFC500A21BCB /* SpriteKit_Inertial_CameraApp.swift in Sources */,
-				DEB875292BC5F00700A21BCB /* Helpers.swift in Sources */,
+				DEB875192BC5EFC500A21BCB /* InertialCameraApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -280,11 +278,14 @@
 				DEVELOPMENT_TEAM = G2XS6FMGZT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Inertial-Camera/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Inertial Camera";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -293,9 +294,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.achrafkassioui.SpriteKit-Inertial-Camera";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -309,11 +312,14 @@
 				DEVELOPMENT_TEAM = G2XS6FMGZT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Inertial-Camera/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Inertial Camera";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -322,9 +328,11 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.achrafkassioui.SpriteKit-Inertial-Camera";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
