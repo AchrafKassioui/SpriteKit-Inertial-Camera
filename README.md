@@ -8,10 +8,6 @@ This is a custom SpriteKit camera that you can use to navigate around the scene 
 
 *Coming soon...*
 
-## Screenshots
-
-*Coming soon...*
-
 ## Setup
 
 Add the `InertialCamera` file or class to your project, then create an instance of the camera and set it as the scene camera, for example inside `didMove`:
