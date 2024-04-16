@@ -4,7 +4,7 @@
  
  Achraf Kassioui
  Created: 9 April 2024
- Updated: 15 April 2024
+ Updated: 16 April 2024
  
  */
 
@@ -95,8 +95,8 @@ class CameraDemoScene: SKScene {
         addChild(inertialCamera)
         
         /// create visualization
-        let gestureVisualizer = GestureVisualizer(scene: self)
-        addChild(gestureVisualizer)
+        let gestureVisualization = GestureVisualization(scene: self)
+        addChild(gestureVisualization)
         
         /// create UI
         createCameraResetButton(view: view)
@@ -187,7 +187,7 @@ class CameraDemoScene: SKScene {
             if inertialCamera.lock { return }
             
             inertialCamera.stopInertia()
-            inertialCamera.setCameraTo(
+            inertialCamera.setTo(
                 position: .zero,
                 xScale: 1,
                 yScale: 1,
@@ -294,205 +294,6 @@ class ButtonWithLabel: SKShapeNode {
         onTouch()
     }
     
-}
-
-// MARK: - Gesture visualization
-/**
- 
- This class is used to visualize gestures.
- It setups its own gesture recognizers, independant from the camera's.
- The visualization provides useful interaction feedback and debug information.
- 
- */
-
-class GestureVisualizer: SKNode, UIGestureRecognizerDelegate {
-    
-    /// variables
-    private var gestureVisualizationNodes: [String: SKShapeNode] = [:]
-    private let myFontName: String = "GillSans-SemiBold"
-    private let myFontColor = SKColor(white: 0, alpha: 0.8)
-    private let myStrokeColor = SKColor(white: 1, alpha: 0.8)
-    
-    /// initialization
-    weak var parentScene: SKScene?
-    
-    init(scene: SKScene) {
-        self.parentScene = scene
-        super.init()
-        
-        if let view = scene.view {
-            self.setupGestureRecognizers(in: view)
-        }
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    /// gesture recognizers setup
-    func setupGestureRecognizers(in view: SKView) {
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(updateGestureVisualization(gesture:)))
-        let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(updateGestureVisualization(gesture:)))
-        let rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(updateGestureVisualization(gesture:)))
-        
-        panGesture.maximumNumberOfTouches = 2
-        
-        view.addGestureRecognizer(panGesture)
-        view.addGestureRecognizer(pinchGesture)
-        view.addGestureRecognizer(rotationGesture)
-        
-        panGesture.delegate = self
-        pinchGesture.delegate = self
-        rotationGesture.delegate = self
-    }
-    
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
-    }
-    
-    @objc func updateGestureVisualization(gesture: UIGestureRecognizer) {
-        if let panGesture = gesture as? UIPanGestureRecognizer {
-            visualizePanGesture(panGesture)
-        }
-        
-        if let pinchGesture = gesture as? UIPinchGestureRecognizer {
-            visualizePinchGesture(pinchGesture)
-        }
-        
-        if let rotationGesture = gesture as? UIRotationGestureRecognizer {
-            visualizeRotationGesture(rotationGesture)
-        }
-        
-        if gesture.state == .ended || gesture.state == .cancelled {
-            clearGestureVisualization(for: gesture)
-        }
-    }
-    
-    /// handle gestures
-    private func visualizePanGesture(_ gesture: UIPanGestureRecognizer) {
-        guard let scene = parentScene else { return }
-        let panPointInView = gesture.location(in: scene.view)
-        let panPointInScene = scene.convertPoint(fromView: panPointInView)
-        updateOrCreateAnchorNode(name: "pan", position: panPointInScene, color: .systemBlue)
-    }
-    
-    private func visualizePinchGesture(_ gesture: UIPinchGestureRecognizer) {
-        guard let scene = parentScene else { return }
-        let pinchCenterInView = gesture.location(in: scene.view)
-        let pinchCenterInScene = scene.convertPoint(fromView: pinchCenterInView)
-        updateOrCreateAnchorNode(name: "pinch", position: pinchCenterInScene, color: .systemBlue)
-        
-        if gesture.numberOfTouches == 2 {
-            for i in 0..<2 {
-                let touchLocationInView = gesture.location(ofTouch: i, in: scene.view)
-                let touchLocationInScene = scene.convertPoint(fromView: touchLocationInView)
-                updateOrCreateTouchNode(name: "pinch-touch-\(i)", position: touchLocationInScene, color: .systemBlue)
-            }
-        }
-    }
-    
-    private func visualizeRotationGesture(_ gesture: UIRotationGestureRecognizer) {
-        guard let scene = parentScene else { return }
-        let rotationCenterInView = gesture.location(in: scene.view)
-        let rotationCenterInScene = scene.convertPoint(fromView: rotationCenterInView)
-        updateOrCreateAnchorNode(name: "rotation", position: rotationCenterInScene, color: .systemBlue)
-        
-        if gesture.numberOfTouches == 2 {
-            for i in 0..<2 {
-                let touchLocationInView = gesture.location(ofTouch: i, in: scene.view)
-                let touchLocationInScene = scene.convertPoint(fromView: touchLocationInView)
-                updateOrCreateTouchNode(name: "rotation-touch-\(i)", position: touchLocationInScene, color: .systemBlue)
-            }
-        }
-    }
-    
-    /// node creation and manipulation
-    private func updateOrCreateAnchorNode(name: String, position: CGPoint, color: SKColor) {
-        if let node = gestureVisualizationNodes[name] {
-            node.position = position
-            adjustForCamera(node: node)
-        } else {
-            let node = SKShapeNode(circleOfRadius: 2)
-            
-            //node.fillColor = color
-            node.strokeColor = .systemBlue
-            node.name = name
-            node.zPosition = 9999
-            node.position = position
-            adjustForCamera(node: node)
-            
-            addChild(node)
-            
-            let label = SKLabelNode(text: name)
-            label.fontName = myFontName
-            label.fontColor = myFontColor
-            label.fontSize = 16
-            
-            if (name == "pan") {
-                label.verticalAlignmentMode = .baseline
-                label.horizontalAlignmentMode = .right
-                label.position = CGPoint(x: -20, y: 20)
-            }
-            if (name == "pinch") {
-                label.verticalAlignmentMode = .baseline
-                label.horizontalAlignmentMode = .left
-                label.position = CGPoint(x: 20, y: 20)
-            }
-            if (name == "rotation") {
-                label.verticalAlignmentMode = .top
-                label.horizontalAlignmentMode = .right
-                label.position = CGPoint(x: -20, y: -20)
-            }
-            
-            //node.addChild(label)
-            
-            gestureVisualizationNodes[name] = node
-        }
-    }
-    
-    private func updateOrCreateTouchNode(name: String, position: CGPoint, color: SKColor) {
-        if let node = gestureVisualizationNodes[name] {
-            node.position = position
-            adjustForCamera(node: node)
-        } else {
-            let node = SKShapeNode(circleOfRadius: 22)
-            node.name = name
-            node.fillColor = color
-            node.strokeColor = myStrokeColor
-            node.zPosition = 9999
-            node.position = position
-            adjustForCamera(node: node)
-            addChild(node)
-            
-            gestureVisualizationNodes[name] = node
-        }
-    }
-    
-    func clearGestureVisualization(for gesture: UIGestureRecognizer) {
-        switch gesture {
-            case is UIPanGestureRecognizer:
-                clearVisualizationNodes(withName: "pan")
-            case is UIPinchGestureRecognizer:
-                clearVisualizationNodes(withName: "pinch")
-            case is UIRotationGestureRecognizer:
-                clearVisualizationNodes(withName: "rotation")
-            default:
-                break
-        }
-    }
-    
-    private func clearVisualizationNodes(withName name: String) {
-        let nodesToRemove = gestureVisualizationNodes.filter { $0.key.contains(name) }
-        nodesToRemove.forEach { $0.value.removeFromParent() }
-        gestureVisualizationNodes = gestureVisualizationNodes.filter { !$0.key.contains(name) }
-    }
-    
-    private func adjustForCamera(node: SKNode) {
-        if let camera = parentScene?.camera {
-            node.xScale = camera.xScale
-            node.yScale = camera.yScale
-        }
-    }
 }
 
 // MARK: -  Grid generator
