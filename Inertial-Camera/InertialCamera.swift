@@ -102,7 +102,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     var lockScale = false
     var lockRotation = false
     
-    /// a full `lock` is disables the gesture recognizers
+    /// a full `lock` disables the gesture recognizers
     var lock = false
     
     // MARK: - Initialization

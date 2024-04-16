@@ -20,8 +20,9 @@ class GestureVisualization: SKNode, UIGestureRecognizerDelegate {
     private var gestureVisualizationNodes: [String: SKNode] = [:]
     private let myFontName: String = "GillSans-SemiBold"
     private let myFontColor = SKColor(white: 0, alpha: 0.8)
-    private let myStrokeColor = SKColor(white: 0, alpha: 0.8)
+    private let myStrokeColor = SKColor(white: 1, alpha: 0.8)
     private let circleRadius: CGFloat = 30
+    private let touchColor = SKColor(red: 10/255, green: 132/255, blue: 255/255, alpha: 0.8)
     
     /// initialization
     weak var parentScene: SKScene?
@@ -67,7 +68,7 @@ class GestureVisualization: SKNode, UIGestureRecognizerDelegate {
         if gesture.numberOfTouches == 1 {
             let panPointInView = gesture.location(in: scene.view)
             let panPointInScene = scene.convertPoint(fromView: panPointInView)
-            updateOrCreateTouchNode(name: "pan", position: panPointInScene, color: .systemBlue)
+            updateOrCreateTouchNode(name: "pan", position: panPointInScene, color: touchColor)
         } else {
             clearGestureVisualization(for: gesture)
         }
@@ -84,7 +85,7 @@ class GestureVisualization: SKNode, UIGestureRecognizerDelegate {
             for i in 0..<2 {
                 let touchLocationInView = gesture.location(ofTouch: i, in: scene.view)
                 let touchLocationInScene = scene.convertPoint(fromView: touchLocationInView)
-                updateOrCreateTouchNode(name: "pinch-touch-\(i)", position: touchLocationInScene, color: .systemBlue)
+                updateOrCreateTouchNode(name: "pinch-touch-\(i)", position: touchLocationInScene, color: touchColor)
             }
         } else {
             clearGestureVisualization(for: gesture)
@@ -102,7 +103,7 @@ class GestureVisualization: SKNode, UIGestureRecognizerDelegate {
             for i in 0..<2 {
                 let touchLocationInView = gesture.location(ofTouch: i, in: scene.view)
                 let touchLocationInScene = scene.convertPoint(fromView: touchLocationInView)
-                updateOrCreateTouchNode(name: "rotation-touch-\(i)", position: touchLocationInScene, color: .systemBlue)
+                updateOrCreateTouchNode(name: "rotation-touch-\(i)", position: touchLocationInScene, color: touchColor)
             }
         } else {
             clearGestureVisualization(for: gesture)

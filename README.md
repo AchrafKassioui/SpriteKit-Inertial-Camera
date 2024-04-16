@@ -6,7 +6,11 @@ This is a custom SpriteKit camera that you can use to navigate around the scene 
 
 ## Video
 
-https://github.com/AchrafKassioui/SpriteKit-Inertial-Camera/assets/1216689/3d390707-f683-4d1e-8b0e-2102efc1c20d
+https://github.com/AchrafKassioui/SpriteKit-Inertial-Camera/assets/1216689/9846b646-fd6b-4306-91fa-d8f758b5f3fb
+
+https://github.com/AchrafKassioui/SpriteKit-Inertial-Camera/assets/1216689/d05ca33b-07b7-4ecd-972a-50a5eae10fe5
+
+https://github.com/AchrafKassioui/SpriteKit-Inertial-Camera/assets/1216689/d0ff13d8-8c71-4ea0-b2e5-a75623d5ef4f
 
 ## Setup
 

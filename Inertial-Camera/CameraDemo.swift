@@ -70,7 +70,8 @@ class CameraDemoScene: SKScene {
         addChild(xAxis)
         
         /// create view frame
-        let viewFrame = SKShapeNode(rectOf: CGSize(width: view.frame.width, height: view.frame.height))
+        let viewFrame = SKShapeNode(rectOf: CGSize(width: view.frame.width + 9, height: view.frame.height + 9))
+        viewFrame.position = CGPoint(x: -3, y: -3)
         viewFrame.lineWidth = 3
         viewFrame.strokeColor = SKColor(white: 0, alpha: 0.9)
         viewFrame.lineJoin = .round
@@ -87,6 +88,12 @@ class CameraDemoScene: SKScene {
         sprite.position.y = 300
         sprite.zRotation = .pi * 0.2
         addChild(sprite)
+        
+        let label = SKLabelNode(text: "Rotation")
+        label.fontName = "GillSans-SemiBold"
+        label.fontSize = 64
+        label.fontColor = .systemBlue
+        //addChild(label)
         
         /// create camera
         let inertialCamera = InertialCamera(scene: self)
