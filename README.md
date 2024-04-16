@@ -39,7 +39,7 @@ override func update(_ currentTime: TimeInterval) {
 
 ### Inertia
 
-Selectively enable or disable inertia for each transformation:
+Dynamically toggle inertia for each transform:
 
 ```swift
 inertialCamera.enablePanInertia = true
@@ -88,18 +88,16 @@ inertialCamera.minScale = 0.01
 
 ### Lock
 
-Selectively lock each transformation, or all of them. A full lock disables the gesture recognizers that have been attached to the view when the camera was instantiated.
+Dynamically lock each transform:
 
 ```swift
 inertialCamera.lockPan = false
 inertialCamera.lockScale = false
 inertialCamera.lockRotation = false
 
-/// full lock
+/// full lock, which disables gesture recognition
 inertialCamera.lock = false
 ```
-
-When reset, a lock set to zero the velocity of the corresponding transformation. The inertia simulation will stop.
 
 ### Set to
 
