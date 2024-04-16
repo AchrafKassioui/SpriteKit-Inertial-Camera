@@ -2,7 +2,7 @@
 
 #  SpriteKit Inertial Camera
 
-This custom SpriteKit camera allows you to navigate around the scene using multi-touch gestures. You can pan, pinch, and rotate to control the camera. When a gesture ends, the camera maintain the velocity of its transformations then gradually slows them down over time.
+This is a custom SpriteKit camera that you can use to navigate around the scene using multi-touch gestures. It supports pan, pinch, and rotate, as well as inertia on each transforms.
 
 ## Video
 
@@ -25,7 +25,7 @@ override func didMove(to view: SKView) {
 }
 ```
 
-In order to enable inertia, the `updateInertia()` method of can be called inside the `update` loop of the scene:
+In order to enable inertia, call the `updateInertia()` inside the scene `update`:
 
 ```swift
 override func update(_ currentTime: TimeInterval) {
@@ -42,9 +42,9 @@ override func update(_ currentTime: TimeInterval) {
 Selectively enable or disable inertia for each transformation:
 
 ```swift
-inertialCamera.enablePanInertia = true /// default
-inertialCamera.enableScaleInertia = true /// default
-inertialCamera.enableRotationInertia = true /// default
+inertialCamera.enablePanInertia = true
+inertialCamera.enableScaleInertia = true
+inertialCamera.enableRotationInertia = true
 ```
 
 Tweak the friction values:
@@ -59,30 +59,30 @@ inertialCamera.scaleInertia = 0.75
 inertialCamera.rotationInertia = 0.85
 ```
 
-Apply arbitrary values to the camera velocity:
+If inertia is enabled, programmatically change the camera's velocity:
 
 ```swift
-inertialCamera.positionVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
-inertialCamera.scaleVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
-inertialCamera.rotationVelocity: CGFloat = 0.1
+inertialCamera.positionVelocity = (0, 0)
+inertialCamera.scaleVelocity = (0, 0)
+inertialCamera.rotationVelocity = 0
 ```
 
-Stop all ongoing inertia. This is typically called with a `touchesBegan` event, so that the camera stops moving when the user touches the screen:
+Stop all ongoing inertia. This is typically called by a `touchesBegan` event, so that the camera stops moving when the user touches the screen.
 
 ```swift
 inertialCamera.stopInertia()
 ```
 
-`stopInertia` is a convenience method. Under the hood, it sets to zero the current stored inertia for each transform.
+`stopInertia()` is a convenience method equivalent to setting all velocities to zero.
 
 ### Zoom
 
-Set the minimum and maximum zoom levels:
+Set a minimum and maximum zoom level:
 
 ```swift
- /// a max zoom out of 0.01x
+/// a max zoom out of 0.01x
 inertialCamera.maxScale = 100
- /// a max zoom in of 100x
+/// a max zoom in of 100x
 inertialCamera.minScale = 0.01
 ```
 
@@ -101,19 +101,34 @@ inertialCamera.lock = false
 
 When reset, a lock set to zero the velocity of the corresponding transformation. The inertia simulation will stop.
 
+### Set to
+
+Send the camera to a position, scale, and rotation with an animation:
+
+```swift
+inertialCamera.setTo(
+    position: CGPoint(x: 0, y: 0),
+    xScale: 1,
+    yScale: 1,
+    rotation: 0
+)
+```
+
 ### Adaptive filtering
 
-Change the filtering mode of textures depending on camera zoom. When the scale is below 1 (zoom in) on either x or y, linear filtering on `SKSpriteNode` and anti-aliasing on `SKShapeNode` are disabled. When the scale is 1 or above (zoom out) on either x and y, linear filtering and anti aliasing are enabled (the default renderer behavior).
+Change the filtering mode of textures depending on camera zoom. When the scale is below 1 (zoom in) on either x or y, linear filtering on `SKSpriteNode` and anti-aliasing on `SKShapeNode` are disabled. When the scale is 1 or above (zoom out) on either x and y, linear filtering and anti-aliasing are enabled, which is the default renderer behavior.
 
-This is an opinionated feature. When the camera is zoomed in, I want to see the pixel grid, not a blur. This behavior can be toggled.
+This is an opinionated feature. This behavior can be toggled:
 
 ```swift
 inertialCamera.adaptiveFiltering = true
 ```
 
+Note that in SpriteKit, filtering and anti-aliasing properties are only available on `SKTexture` and `SKShapeNode`. Other drawing nodes such as `SKLabelNode` or `SKEmitterNode` do not expose such properties.
+
 ## Compatibility
 
-Developed with Xcode 15.4 and tested on iOS 17.4.1.
+Developed with Xcode 15 and tested on iOS 17.
 
 On macOS, although the panning works, the controls aren't yet adapted to the trackpad, mouse, and keyboard.
 
