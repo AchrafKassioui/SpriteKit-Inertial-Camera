@@ -19,7 +19,7 @@ Add the `InertialCamera` file or class to your project, then create an instance 
 ```swift
 override func didMove(to view: SKView) {
     size = view.bounds.size
-    let inertialCamera = InertialCamera(view: view, scene: self)
+    let inertialCamera = InertialCamera(scene: self)
     camera = inertialCamera
     addChild(inertialCamera)
 }
