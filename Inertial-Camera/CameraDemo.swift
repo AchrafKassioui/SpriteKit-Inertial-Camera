@@ -4,7 +4,7 @@
  
  Achraf Kassioui
  Created: 9 April 2024
- Updated: 16 April 2024
+ Updated: 19 April 2024
  
  */
 
@@ -24,6 +24,7 @@ struct CameraDemoView: View {
             //debugOptions: [.showsNodeCount, .showsDrawCount, .showsFPS]
         )
         .ignoresSafeArea()
+        .background(Color(red: 0.89, green: 0.89, blue: 0.84))
     }
 }
 
@@ -39,6 +40,7 @@ class CameraDemoScene: SKScene {
         /// configure view
         size = view.bounds.size
         scaleMode = .resizeFill
+        view.contentMode = .center
         backgroundColor = SKColor(red: 0.89, green: 0.89, blue: 0.84, alpha: 1)
         
         /// setup scene physics
@@ -70,14 +72,13 @@ class CameraDemoScene: SKScene {
         addChild(xAxis)
         
         /// create view frame
-        let viewFrame = SKShapeNode(rectOf: CGSize(width: view.frame.width + 9, height: view.frame.height + 9))
-        viewFrame.position = CGPoint(x: -3, y: -3)
+        let viewFrame = SKShapeNode(rectOf: CGSize(width: view.frame.width, height: view.frame.height))
         viewFrame.lineWidth = 3
         viewFrame.strokeColor = SKColor(white: 0, alpha: 0.9)
         viewFrame.lineJoin = .round
         addChild(viewFrame)
         
-        /// create sprite
+        /// create objects
         let sprite = SKSpriteNode(color: .systemRed, size: CGSize(width: 60, height: 60))
         sprite.name = "sprite"
         sprite.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: 60, height: 60))
@@ -88,12 +89,6 @@ class CameraDemoScene: SKScene {
         sprite.position.y = 300
         sprite.zRotation = .pi * 0.2
         addChild(sprite)
-        
-        let label = SKLabelNode(text: "Rotation")
-        label.fontName = "GillSans-SemiBold"
-        label.fontSize = 64
-        label.fontColor = .systemBlue
-        //addChild(label)
         
         /// create camera
         let inertialCamera = InertialCamera(scene: self)
@@ -223,7 +218,8 @@ class CameraDemoScene: SKScene {
     // MARK: Touch events
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for _ in touches {            
+        for _ in touches {
+            /// stop camera inertia on touch
             if let inertialCamera = camera as? InertialCamera {
                 inertialCamera.stopInertia()
             }
@@ -240,7 +236,7 @@ class CameraDemoScene: SKScene {
  Parameters:
  - Parameter size: the rectangular size of the button
  - Parameter textContent: the button label
- - Parameter onTouch: the function to execute whenever the button is touched. A touch toggles the `isActive` property
+ - Parameter onTouch: a function to execute whenever the button is touched. A touch toggles the `isActive` property
  
  */
 

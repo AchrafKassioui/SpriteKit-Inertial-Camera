@@ -13,7 +13,7 @@
  ```
  override func didMove(to view: SKView) {
      size = view.bounds.size
-     let inertialCamera = InertialCameraNode(view: view, scene: self)
+     let inertialCamera = InertialCameraNode(scene: self)
      camera = inertialCamera
      addChild(inertialCamera)
  }
@@ -54,7 +54,7 @@
  
  Achraf Kassioui
  Created: 8 April 2024
- Updated: 16 April 2024
+ Updated: 19 April 2024
  
  */
 
@@ -156,7 +156,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         let initialScale = max(self.xScale, self.yScale)
         let finalScale = max(xScale, yScale)
         var scaleDelta: CGFloat
-        if initialScale >= 1 {
+        if initialScale >= xScale || initialScale >= yScale {
             scaleDelta = initialScale / finalScale
         } else {
             scaleDelta = finalScale / initialScale
