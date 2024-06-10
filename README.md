@@ -37,6 +37,62 @@ override func update(_ currentTime: TimeInterval) {
 
 ## Configuration
 
+### Scene
+
+The scene object is optional during initiliazatino, which allows to create an inertial camera object in a model without a reference to the scene. However, passing a scene is necessary to setup the gesture recognizers. You can initialize the camera without a scene, then pass a scene later through the `parentScene` property:
+
+```swift
+struct MyModel {
+    var myCamera = InertialCamera()
+}
+
+class myScene: SKScene {
+    var myModel = MyModel()
+    
+    override func didMove(to view: SKView) {
+        let inertialCamera = myModel.myCamera
+        inertialCamera.delegate = self
+        inertialCamera.parentScene = self
+        camera = inertialCamera
+        addChild(inertialCamera)
+    }
+}
+```
+
+### Protocol
+
+InertialCamera has a `InertialCameraDelegate` protocol that you can use to notify you of various camera changes. You implement the protocol like this:
+
+```swift
+/// Add the protocol to your scene declaration
+class myScene: SKScene, InertialCameraDelegate {
+
+    override func didMove(to view: SKView) {
+        let inertialCamera = InertialCamera(scene: self)
+        
+        /// Set the scene as delegate of the camera
+        inertialCamera.delegate = self
+        
+        camera = inertialCamera
+        addChild(inertialCamera)
+    }
+
+    /// Include the methods required by the protocol
+    
+    func cameraWillScale(to scale: (x: CGFloat, y: CGFloat)) {
+        /// Called before the camera is about to scale
+    }
+
+    func cameraDidScale(to scale: (x: CGFloat, y: CGFloat)) {
+        /// Called after the camera has scaled
+    }
+
+    func cameraDidMove(to position: CGPoint) {
+        /// Called after the camera has moved
+    }
+}
+```
+
 ### Inertia
 
 Dynamically toggle inertia for each transform:
@@ -80,10 +136,10 @@ inertialCamera.stopInertia()
 Set a minimum and maximum zoom level:
 
 ```swift
-/// a max zoom out of 0.01x
-inertialCamera.maxScale = 100
-/// a max zoom in of 100x
-inertialCamera.minScale = 0.01
+/// Zoom out to 10%
+inertialCamera.maxScale = 10
+/// Zoom in to 400%
+inertialCamera.minScale = 0.25
 ```
 
 ### Lock
