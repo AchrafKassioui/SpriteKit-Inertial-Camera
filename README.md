@@ -39,7 +39,7 @@ override func update(_ currentTime: TimeInterval) {
 
 ### Scene
 
-The scene object is optional during initiliazatino, which allows to create an inertial camera object in a model without a reference to the scene. However, passing a scene is necessary to setup the gesture recognizers. You can initialize the camera without a scene, then pass a scene later through the `parentScene` property:
+The scene object is optional during initialization, which allows to create an inertial camera object in a model without a reference to the scene. However, passing a scene is necessary to setup the gesture recognizers. You can initialize the camera without a scene, then pass a scene later through the `parentScene` property:
 
 ```swift
 struct MyModel {
