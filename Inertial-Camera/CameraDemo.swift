@@ -4,14 +4,14 @@
  
  Achraf Kassioui
  Created: 9 April 2024
- Updated: 19 April 2024
+ Updated: 10 Junel 2024
  
  */
 
 import SwiftUI
 import SpriteKit
 
-// MARK: - Live preview
+// MARK: - Live Preview
 
 struct CameraDemoView: View {
     var myScene = CameraDemoScene()
@@ -21,7 +21,6 @@ struct CameraDemoView: View {
             scene: myScene,
             preferredFramesPerSecond: 120,
             options: [.ignoresSiblingOrder, .shouldCullNonVisibleNodes]
-            //debugOptions: [.showsNodeCount, .showsDrawCount, .showsFPS]
         )
         .ignoresSafeArea()
         .background(Color(red: 0.89, green: 0.89, blue: 0.84))
@@ -32,7 +31,7 @@ struct CameraDemoView: View {
     CameraDemoView()
 }
 
-// MARK: - Demo scene
+// MARK: - Demo Scene
 
 class CameraDemoScene: SKScene {
         
@@ -284,15 +283,14 @@ class ButtonWithLabel: SKShapeNode {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private var pulseAnimation = SKAction.sequence([
-        SKAction.scale(to: 1.2, duration: 0.05),
-        SKAction.scale(to: 0.95, duration: 0.05),
+    private var hotAnimation = SKAction.sequence([
+        SKAction.scale(to: 0.9, duration: 0.05),
         SKAction.scale(to: 1, duration: 0.02)
     ])
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         self.isActive.toggle()
-        self.run(pulseAnimation)
+        self.run(hotAnimation)
         hapticFeedback.impactOccurred()
         onTouch()
     }
