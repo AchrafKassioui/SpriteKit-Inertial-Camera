@@ -66,16 +66,15 @@ class MyObject: InertialCameraDelegate {
     func cameraDidRotate(to angle: CGFloat) {
     
     }
-
 }
 ```
 
 Then, in the scene that instantiates the camera, make sure to call the camera’s `didEvaluateActions()` method inside the scene’s `didEvaluateActions()` override:
 
 ```swift
-    override func didEvaluateActions() {
-        inertialCamera?.didEvaluateActions()
-    }
+override func didEvaluateActions() {
+    inertialCamera?.didEvaluateActions()
+}
 ```
 
 This is necessary because some camera methods use SKAction, and SKAction doesn’t automatically notify the camera of the transform changes it makes. Additional code is run after the actions have been evaluated, to keep the protocol functions up to date.
