@@ -2,56 +2,41 @@
  
  # The Inertial Camera class
  
- This is a custom camera that allows you to freely navigate around the scene in an infinite canvas fashion.
+ This is a custom SpriteKit camera that allows you to freely navigate around the scene using multi-touch gestures.
  You use pan, pinch, and rotate gestures to control the camera.
  The camera includes inertia: at the end of each gesture, the velocity of the change is maintained then slowed down over time.
  
  Tested on iOS. Not adapted for macOS yet.
  
- 
  ## Setup
  
- Include this file in your project, then create an instance of InertialCamera and set it as the scene camera.
+ - Include this file in your project.
+ - Create an instance of InertialCamera.
+ - Set the view that will receive gesture recognition. It could be the SKView or a parent UIView.
+ - Set this camera as the scene camera.
+ - Add the camera to the scene.
  
  ```
  override func didMove(to view: SKView) {
-    size = view.bounds.size
-    let inertialCamera = InertialCameraNode(scene: self)
-    camera = inertialCamera
+    let inertialCamera = InertialCamera()
+    inertialCamera.gesturesView = view
+    self.camera = inertialCamera
     addChild(inertialCamera)
  }
- 
  ```
  
  
  ## Inertia
  
- You enable inertial panning, zooming, and rotating by calling `updateInertia()` inside the SKScene update loop.
+ You enable inertial panning, zooming, and rotating by calling the camera `update()` function from the update function of SKScene.
  
  ```
  override func update(_ currentTime: TimeInterval) {
-     if let inertialCamera = camera as? InertialCamera {
-        inertialCamera.updateInertia()
-     }
+    if let inertialCamera = camera as? InertialCamera {
+        inertialCamera.update()
+    }
  }
  ```
- 
- You can also selectively toggle inertia on each of pan, pinch, and rotate in the camera settings. For example:
- 
- ```
- inertialCamera.enableRotationInertia = false
- 
- ```
- 
- 
- ## Adaptive filtering
- 
- ```
- let objectsLayer = SKNode()
- inertialCamera.setAdaptiveFiltering(forChildrenOf: objectsLayer, to: true)
- 
- ```
- 
  
  ## Challenges
  
@@ -63,33 +48,54 @@
  
  Achraf Kassioui
  Created: 8 April 2024
- Updated: 10 June 2024
+ Updated: 19 December 2024
  
  */
 
 import SpriteKit
 
+// MARK: Protocol
+
 protocol InertialCameraDelegate: AnyObject {
     func cameraWillScale(to scale: (x: CGFloat, y: CGFloat))
     func cameraDidScale(to scale: (x: CGFloat, y: CGFloat))
     func cameraDidMove(to position: CGPoint)
+    func cameraDidRotate(to angle: CGFloat)
 }
 
-/// We subclass SKCameraNode, and add a delegate for UIKit gesture recognizers
+/// Subclass SKCameraNode, and add the protocol that allows simulatenous gesture recognition
 class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
-    // MARK: - Settings
+    // MARK: Settings
     
-    /// toggle panning inertia
+    /// Maximum zoom out. Default is 10, which is a 10% zoom.
+    var maxScale: CGFloat = 10
+    /// Maximum zoom in. Default is 0.25, which is a 400% zoom.
+    var minScale: CGFloat = 0.25
+    
+    /// Toggle position inertia.
     var enablePanInertia = true
-    /// toggle scale inertia
+    /// Toggle scale inertia.
     var enableScaleInertia = true
-    /// toggle rotation inertia
+    /// Toggle rotation inertia.
     var enableRotationInertia = true
+    
+    /// Lock camera pan.
+    var lockPan = false
+    /// Lock camera scale.
+    var lockScale = false
+    /// Lock camera rotation.
+    var lockRotation = false
+    /// Lock the camera by stoping the gesture recogniziers from responding.
+    var lock = false
+    
+    /// Toggle double tap to reset position, scale, and rotation.
+    var doubleTapToReset = false
     
     /**
      
-     Inertia settings.
+     # Inertia Settings
+     
      Values between 0 and 1. Lower values = higher friction.
      A value of 1 will perpetuate the motion indefinitely.
      Values more than 1 will accelerate exponentially. Negative values are unstable.
@@ -102,44 +108,59 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     /// Rotation is multiplied by this factor every frame. Default is 0.85
     var rotationInertia: CGFloat = 0.85
     
+    /// Gesture changes that take longer than this duration in seconds will not trigger inertia.
+    private var thresholdDurationForInertia: Double = 0.02
+    
+    // MARK: API
     /**
      
-     Inertia state.
-     You can control the camera programmatically by passing a value to these variables
+     You can control the camera programmatically by setting these values manually.
      
      */
-    var positionVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
-    var scaleVelocity: (x: CGFloat, y: CGFloat) = (0, 0)
+    /// The state of position velocity.
+    var positionVelocity = CGVector(dx: 0, dy: 0)
+    /// The state of scale velocity.
+    var scaleVelocity = CGVector(dx: 0, dy: 0)
+    /// The state of rotation velocity.
     var rotationVelocity: CGFloat = 0
     
-    /// Convenience method. Called to stop all ongoing inertia.
-    func stopInertia() {
-        positionVelocity = (0.0, 0.0)
-        scaleVelocity = (0.0, 0.0)
+    /// Stop all ongoing inertia and internal actions.
+    func stop() {
+        self.removeAction(forKey: actionName)
+        
+        positionVelocity = .zero
+        scaleVelocity = .zero
         rotationVelocity = 0
     }
     
+    // MARK: Initialization
     /**
      
-     Camera zoom settings.
+     Creating the camera requires to pass in the view on which the gesture recognizers will be setup.
+     That view can be the SKView presenting the scene, or any UIView in the parent hierarchy of SKView.
      
      */
-    /// Maximum camera scale. Default is 10, which is a 10% zoom.
-    var maxScale: CGFloat = 10
-    /// Minimum camera scale. Default is 0.25, which is a 400% zoom.
-    var minScale: CGFloat = 0.25
+    /// The view on which the camera gesture recognizers are setup.
+    weak var gesturesView: UIView? {
+        didSet {
+            if let view = gesturesView {
+                setupGestureRecognizers(gesturesView: view)
+            }
+        }
+    }
     
-    /// selectively lock the camera transforms
-    var lockPan = false
-    var lockScale = false
-    var lockRotation = false
-    
-    /// a full `lock` disables the gesture recognizers
-    var lock = false
-    
-    // MARK: - Property Observers
-    
+    // MARK: Property Observers
+    /**
+     
+     The notifications for the camera protocol methods are made here.
+     
+     */
     weak var delegate: InertialCameraDelegate?
+    
+    /// Some transform changes, such as those made with SKAction, do not trigger property observers.
+    /// https://developer.apple.com/documentation/spritekit/skaction/detecting_changes_at_each_step_of_an_animation
+    /// This tracking variable is used to manually set the transforms in the appropriate run loop, for example in didEvaluateActions.
+    private var manuallyTriggerThePropertyObservers: Bool = false
     
     override var xScale: CGFloat {
         willSet {
@@ -167,114 +188,124 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         }
     }
     
-    // MARK: - Initialization
+    override var zRotation: CGFloat {
+        didSet {
+            delegate?.cameraDidRotate(to: zRotation)
+        }
+    }
+    
+    // MARK: Isometric View
     /**
      
-     We need methods from the `scene` and the `view`.
-     We store a weak reference to the scene, which itself has a reference to the view.
-     We either pass the scene during init, or we manually assign a scene to the `parentScene` property.
+     Toggle an isometric view of the 2D scene.
+     Unfinished.
      
      */
     
-    /// Assign a scene to the camera, and setup gesture recognizers on the view associated with it.
-    weak var parentScene: SKScene? {
-        didSet {
-            if let scene = parentScene, let view = scene.view {
-                self.setupGestureRecognizers(view: view)
+    private var isIsometric = false
+    private let isometricScaleMultiplier = 0.75
+    private let isometricRotation = -45 * (CGFloat.pi / 180)
+    
+    var isometric: Bool {
+        get { return isIsometric }
+        set {
+            if isIsometric != newValue {
+                isIsometric = newValue
+                
+                let targetXScale = isIsometric ? xScale * isometricScaleMultiplier : xScale / isometricScaleMultiplier
+                let targetRotation = isIsometric ? isometricRotation : 0
+                
+                let scaleAction = SKAction.scaleX(to: targetXScale, duration: 0.3)
+                let rotateAction = SKAction.rotate(toAngle: targetRotation, duration: 0.3)
+                
+                run(SKAction.group([scaleAction, rotateAction]))
             }
         }
     }
     
-    /// Assign a scene now, or do it later with the parentScene property.
-    init(scene: SKScene? = nil) {
-        super.init()
-        self.parentScene = scene
-        
-        /// If a scene is passed during init, setup gesture recognizers
-        /// Init does not trigger didSet, so we do it manually here
-        if let scene = scene, let view = scene.view {
-            self.setupGestureRecognizers(view: view)
-        }
-    }
-    
-    required init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    // MARK: - Set camera
+    // MARK: Set Camera
     /**
      
-     Send the camera to a specific position, scale, and rotation, with an animation.
-     
-     ## Todo
-     
-     SpriteKit actions do not trigger property observers like didSet, and therefore, delegate functions won't be called properly.
-     We need to observe changes made by SKAction on camera position, rotation, and scale.
+     Animate the camera to a specific position, scale, and rotation.
      
      */
-    func setTo(position: CGPoint, xScale: CGFloat, yScale: CGFloat, rotation: CGFloat) {
-        self.stopInertia()
-        self.delegate?.cameraWillScale(to: (x: xScale, y: yScale))
+    
+    let actionName: String = "InertialCameraSetAction"
+    
+    func setTo(position: CGPoint? = nil, xScale: CGFloat? = nil, yScale: CGFloat? = nil, rotation: CGFloat? = nil) {
+        if position == nil && xScale == nil && yScale == nil && rotation == nil {
+            return
+        }
+        /// Toggle manual transform tracking because we are going to use SKAction
+        manuallyTriggerThePropertyObservers = true
+        self.stop()
         
-        /// the minimum and maximum durations for the animation of each transform
+        /// Determine final values for animation
+        let targetPosition = position ?? self.position
+        let targetXScale = max(minScale, min(maxScale, xScale ?? self.xScale))
+        let targetYScale = max(minScale, min(maxScale, yScale ?? self.yScale))
+        let targetRotation = rotation ?? self.zRotation
+        
+        /// The minimum and maximum durations for the animation of each transform
         let minDuration: CGFloat = 0.2
         let maxDuration: CGFloat = 3
-        /// the maximum points per second traveled by the camera
+        /// The maximum points per second traveled by the camera
         let translationSpeed: CGFloat = 10000
-        /// the maximum scale factor change per second
+        /// The maximum scale factor change per second
         let scaleSpeed: CGFloat = 50
-        /// the maximum number of camera revolutions per second
+        /// The maximum number of camera revolutions per second
         let rotationSpeed: CGFloat = 4 * .pi
         
-        /// calculate the duration of the translation
-        let distance = sqrt(pow(position.x - self.position.x, 2) + pow(position.y - self.position.y, 2))
+        /// Calculate the animation duration of the translation
+        let distance = sqrt(pow(targetPosition.x - self.position.x, 2) + pow(targetPosition.y - self.position.y, 2))
         let translationDuration = min(maxDuration, max(minDuration, Double(distance / translationSpeed)))
         
-        /// calculate the duration of the scaling
+        /// Calculate the animation duration of the scaling
         let initialScale = max(self.xScale, self.yScale)
-        let finalScale = max(xScale, yScale)
+        let finalScale = max(targetXScale, targetYScale)
         var scaleDelta: CGFloat
-        if initialScale >= xScale || initialScale >= yScale {
+        if initialScale >= targetXScale || initialScale >= targetYScale {
             scaleDelta = initialScale / finalScale
         } else {
             scaleDelta = finalScale / initialScale
         }
         let scaleDuration = min(maxDuration, max(minDuration, Double(scaleDelta / scaleSpeed)))
         
-        /// calculate the duration of the rotation
-        let rotationDelta = abs(rotation - self.zRotation)
+        /// Calculate the animation duration of the rotation
+        let rotationDelta = abs(targetRotation - self.zRotation)
         let rotationDuration = min(maxDuration, max(minDuration, Double(rotationDelta / rotationSpeed)))
         
-        /// choose the longest duration
-        /// use this if the animations are grouped instead of sequenced
-        //let longestDuration = max(translationDuration, scaleDuration, rotationDuration)
-        
-        /// create and run animation actions
-        let translationAction = SKAction.move(to: position, duration: translationDuration)
+        /// Create and run the animation
+        let translationAction = SKAction.move(to: targetPosition, duration: translationDuration)
         translationAction.timingMode = .easeInEaseOut
-        let scaleAction = SKAction.scaleX(to: xScale, y: yScale, duration: scaleDuration)
+        let scaleAction = SKAction.scaleX(to: targetXScale, y: targetYScale, duration: scaleDuration)
         scaleAction.timingMode = .easeInEaseOut
-        let rotateAction = SKAction.rotate(toAngle: rotation, duration: rotationDuration)
+        let rotateAction = SKAction.rotate(toAngle: targetRotation, duration: rotationDuration)
         rotateAction.timingMode = .easeInEaseOut
         
         var finalAnimation: SKAction
         
-        if (self.xScale >= xScale || self.yScale >= yScale) {
+        /// The order of the animation depends on whether the camera is zooming in or out
+        if (self.xScale >= targetXScale || self.yScale >= targetYScale) {
             finalAnimation = SKAction.sequence([translationAction, rotateAction, scaleAction])
         } else {
             finalAnimation = SKAction.sequence([scaleAction, rotateAction, translationAction])
         }
         finalAnimation.timingMode = .easeInEaseOut
         
-        /// SKAction do not trigger property observers
-        /// https://developer.apple.com/documentation/spritekit/skaction/detecting_changes_at_each_step_of_an_animation
-        /// So after running the animation, we manually set the properties
-        self.run(finalAnimation) {
-            self.delegate?.cameraDidScale(to: (x: xScale, y: yScale))
-        }
+        /// After the action ends, stop tracking transforms manually
+        let finalAnimationPlusCompletion = SKAction.sequence([
+            finalAnimation,
+            SKAction.run { [weak self] in
+                self?.manuallyTriggerThePropertyObservers = false
+            }
+        ])
+        
+        /// Assign the action a key so it can be removed later
+        self.run(finalAnimationPlusCompletion, withKey: actionName)
     }
     
-    // MARK: - Adaptive filtering
+    // MARK: Adaptive filtering
     /**
      
      This camera is able to change the filtering mode of SKSpriteNode and SKShapeNode depending on zoom level.
@@ -287,7 +318,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
      
      ## Todo
      
-     Currently very broken.
+     Currently broken.
      
      */
     
@@ -335,54 +366,49 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         }
     }
     
-    // MARK: - Shared gestures state
-    
-    /// Gesture changes that take longer than this duration in seconds will not trigger inertia.
-    private var thresholdDurationForInertia: Double = 0.02
-    
     // MARK: Pan
     
-    /// pan state
+    /// Pan state
     private var positionBeforePanGesture = CGPoint.zero
     private var lastPanGestureTimestamp: TimeInterval = 0
     
     @objc private func panCamera(gesture: UIPanGestureRecognizer) {
         if lockPan || lock { return }
         
-        guard let scene = self.parentScene else { return }
+        guard let gesturesView = self.gesturesView else { return }
         
         if gesture.state == .began {
             
-            /// store the camera's position at the beginning of the pan gesture
+            /// Store the camera's position at the beginning of the pan gesture
             positionBeforePanGesture = self.position
             
         } else if gesture.state == .changed {
             
-            /// convert UIKit translation coordinates to SpriteKit's coordinates for mathematical clarity further down
-            let uiKitTranslation = gesture.translation(in: scene.view)
+            /// Convert UIKit translation coordinates to SpriteKit's coordinates for mathematical clarity further down
+            let uiKitTranslation = gesture.translation(in: gesturesView)
             let translation = CGPoint(
                 /// UIKit and SpriteKit share the same x-axis direction
                 x: uiKitTranslation.x,
-                /// invert y because UIKit's y-axis increases downwards, opposite to SpriteKit's
+                /// Invert y because UIKit's y-axis increases downwards, opposite to SpriteKit's
                 y: -uiKitTranslation.y
             )
             
-            /// transform the translation from the screen coordinate system to the camera's local coordinate system, considering its rotation.
+            /// Transform the translation from the screen coordinate system to the camera's local coordinate system, considering its rotation.
             let angle = self.zRotation
             let dx = translation.x * cos(angle) - translation.y * sin(angle)
             let dy = translation.x * sin(angle) + translation.y * cos(angle)
             
-            /// apply the transformed translation to the camera's position, accounting for the current scale.
-            /// we moves the camera opposite to the gesture direction (-dx and -dy), building the impression of moving the scene itself.
-            /// if we wanted direct manipulation of a node, dx and dy would be added instead of subtracted.
+            /// Apply the transformed translation to the camera's position, accounting for the current scale.
+            /// We moves the camera opposite to the gesture direction (-dx and -dy), building the impression of moving the scene itself.
+            /// If we wanted direct manipulation of a node, dx and dy would be added instead of subtracted.
             self.position.x = self.position.x - dx * self.xScale
             self.position.y = self.position.y - dy * self.yScale
             
-            /// it is important to implement panning by immediately applying delta translations to the current camera position.
-            /// if we used a logic that applies the cumulative translation since the gesture has started, there would be a confilct with other logics that also change camera position repeatedly, such as rotation.
-            /// see: https://gist.github.com/AchrafKassioui/bd835b99a78e9ce29b08ce406896c59b
-            /// we reset the translation so that after each gesture change, we get a delta, not an accumulation.
-            gesture.setTranslation(.zero, in: scene.view)
+            /// It is important to implement panning by immediately applying delta translations to the current camera position.
+            /// If we used a logic that applies the cumulative translation since the gesture has started, there would be a confilct with other logics that also change camera position repeatedly, such as rotation.
+            /// See: https://gist.github.com/AchrafKassioui/bd835b99a78e9ce29b08ce406896c59b
+            /// We reset the translation so that after each gesture change, we get a delta, not an accumulation.
+            gesture.setTranslation(.zero, in: gesturesView)
             
             /// Store the timestamp when the gesture last changed
             lastPanGestureTimestamp = Date().timeIntervalSince1970
@@ -393,18 +419,18 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
             /// If the duration is below a threshold, store velocity
             /// If the duration is above a threshold, reset velocity
             if Date().timeIntervalSince1970 - lastPanGestureTimestamp < thresholdDurationForInertia {
-                /// at the end of the gesture, calculate the velocity to pass to the inertia simulation.
-                /// we divide by an arbitrary factor for better user experience
-                positionVelocity.x = self.xScale * gesture.velocity(in: scene.view).x / 80
-                positionVelocity.y = self.yScale * gesture.velocity(in: scene.view).y / 80
+                /// At the end of the gesture, calculate the velocity to pass to the inertia simulation.
+                /// We divide by an arbitrary factor for better user experience.
+                positionVelocity.dx = self.xScale * gesture.velocity(in: gesturesView).x / 80
+                positionVelocity.dy = self.yScale * gesture.velocity(in: gesturesView).y / 80
             } else {
-                positionVelocity = (0, 0)
+                positionVelocity = .zero
             }
             
             
         } else if gesture.state == .cancelled {
             
-            /// if the gesture is cancelled, revert to the camera's position at the beginning of the gesture
+            /// If the gesture is cancelled, revert to the camera's position at the beginning of the gesture
             self.position = positionBeforePanGesture
             
         }
@@ -412,7 +438,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     // MARK: Pinch
     
-    /// zoom state
+    /// Scale state
     private var scaleBeforePinchGesture: (x: CGFloat, y: CGFloat) = (1, 1)
     private var positionBeforePinchGesture = CGPoint.zero
     private var lastPinchGestureTimestamp: TimeInterval = 0
@@ -420,10 +446,10 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     @objc private func scaleCamera(gesture: UIPinchGestureRecognizer) {
         if lockScale || lock { return }
         
-        guard let scene = parentScene else { return }
+        guard let parentScene = self.scene, let gesturesView = self.gesturesView else { return }
         
-        let scaleCenterInView = gesture.location(in: scene.view)
-        let scaleCenterInScene = scene.convertPoint(fromView: scaleCenterInView)
+        let scaleCenterInView = gesture.location(in: gesturesView)
+        let scaleCenterInScene = parentScene.convertPoint(fromView: scaleCenterInView)
         
         if gesture.state == .began {
             
@@ -433,26 +459,26 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
             
         } else if gesture.state == .changed {
             
-            /// respect the base scaling ratio
+            /// Respect the base scaling ratio
             let newXScale = (self.xScale / gesture.scale)
             let newYScale = (self.yScale / gesture.scale)
             
-            /// limit the resulting scale within a range
+            /// Limit the resulting scale within a range
             let clampedXScale = max(min(newXScale, maxScale), minScale)
             let clampedYScale = max(min(newYScale, maxScale), minScale)
             
-            /// calculate a factor to move the camera toward the pinch midpoint
+            /// Calculate a factor to move the camera toward the pinch midpoint
             let xTranslationFactor = clampedXScale / self.xScale
             let yTranslationFactor = clampedYScale / self.yScale
             let newCamPosX = scaleCenterInScene.x + (self.position.x - scaleCenterInScene.x) * xTranslationFactor
             let newCamPosY = scaleCenterInScene.y + (self.position.y - scaleCenterInScene.y) * yTranslationFactor
             
-            /// update camera scale and position
+            /// Update camera scale and position
             self.xScale = clampedXScale
             self.yScale = clampedYScale
             self.position = CGPoint(x: newCamPosX, y: newCamPosY)
             
-            /// reset the gesture scale delta
+            /// Reset the gesture scale delta
             gesture.scale = 1.0
             
             /// Store the timestamp when the gesture last changed
@@ -461,10 +487,10 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         } else if gesture.state == .ended {
             
             if Date().timeIntervalSince1970 - lastPinchGestureTimestamp < thresholdDurationForInertia {
-                scaleVelocity.x = self.xScale * gesture.velocity / 100
-                scaleVelocity.y = self.xScale * gesture.velocity / 100
+                scaleVelocity.dx = self.xScale * gesture.velocity / 100
+                scaleVelocity.dy = self.xScale * gesture.velocity / 100
             } else {
-                scaleVelocity = (0, 0)
+                scaleVelocity = .zero
             }
             
         } else if gesture.state == .cancelled {
@@ -478,7 +504,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     // MARK: Rotate
     
-    /// rotation state
+    /// Rotation state
     private var positionBeforeRotationGesture = CGPoint.zero
     private var rotationBeforeRotationGesture: CGFloat = 0
     private var rotationPivot = CGPoint.zero
@@ -487,10 +513,10 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     @objc private func rotateCamera(gesture: UIRotationGestureRecognizer) {
         if lockRotation || lock { return }
         
-        guard let scene = parentScene else { return }
+        guard let parentScene = self.scene, let gesturesView = self.gesturesView else { return }
         
-        let midpointInView = gesture.location(in: scene.view)
-        let midpointInScene = scene.convertPoint(fromView: midpointInView)
+        let midpointInView = gesture.location(in: gesturesView)
+        let midpointInScene = parentScene.convertPoint(fromView: midpointInView)
         
         if gesture.state == .began {
             
@@ -500,7 +526,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
             
         } else if gesture.state == .changed {
             
-            /// store the rotation delta since the last gesture change, and apply it to the camera, then reset the gesture rotation value
+            /// Store the rotation delta since the last gesture change, and apply it to the camera, then reset the gesture rotation value
             let rotationDelta = gesture.rotation
             self.zRotation += rotationDelta
             gesture.rotation = 0
@@ -539,55 +565,54 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     // MARK: Double tap
     
-    @objc private func resetCamera(gesture: UITapGestureRecognizer) {
-        if lock { return }
+    @objc private func handleDoubleTap(gesture: UITapGestureRecognizer) {
+        if lock || !doubleTapToReset { return }
         
         self.setTo(position: .zero, xScale: 1, yScale: 1, rotation: 0)
     }
     
-    // MARK: Simulate inertia
+    // MARK: Update
     /**
      
-     Inertia is simulated by getting a velocity from the gesture recognizer, then integrating it over time according to the inertia setting.
-     This method should be called by the update loop of the scene that instantiates the camera.
+     Inertia is simulated by getting a velocity after the gesture has ended, then integrating it over time according to inertia settings.
+     This method should be called by the update method of the scene that instantiates the camera.
      
      */
-    func updateInertia() {
-        
-        /// reduce the load by checking the current position velocity first
-        if (enablePanInertia && (positionVelocity.x != 0 || positionVelocity.y != 0)) {
-            /// apply friction to velocity
-            positionVelocity.x *= positionInertia
-            positionVelocity.y *= positionInertia
+    func update() {
+        /// Reduce the load by checking the current position velocity first
+        if (enablePanInertia && (positionVelocity.dx != 0 || positionVelocity.dy != 0)) {
+            /// Apply friction to velocity
+            positionVelocity.dx *= positionInertia
+            positionVelocity.dy *= positionInertia
             
-            /// calculate the rotated velocity to account for camera rotation
+            /// Calculate the rotated velocity to account for camera rotation
             let angle = self.zRotation
-            let rotatedVelocityX = positionVelocity.x * cos(angle) + positionVelocity.y * sin(angle)
-            let rotatedVelocityY = -positionVelocity.x * sin(angle) + positionVelocity.y * cos(angle)
+            let rotatedVelocityX = positionVelocity.dx * cos(angle) + positionVelocity.dy * sin(angle)
+            let rotatedVelocityY = -positionVelocity.dx * sin(angle) + positionVelocity.dy * cos(angle)
             
             /// Stop the camera when velocity is near zero to prevent oscillation
-            if abs(positionVelocity.x) < 0.01 { positionVelocity.x = 0 }
-            if abs(positionVelocity.y) < 0.01 { positionVelocity.y = 0 }
+            if abs(positionVelocity.dx) < 0.01 { positionVelocity.dx = 0 }
+            if abs(positionVelocity.dy) < 0.01 { positionVelocity.dy = 0 }
             
             /// Update the camera's position with the rotated velocity
             self.position.x -= rotatedVelocityX
             self.position.y += rotatedVelocityY
         }
         
-        /// reduce the load by checking the current scale velocity first
-        if (enableScaleInertia && (scaleVelocity.x != 0 || scaleVelocity.y != 0)) {
+        /// Reduce the load by checking the current scale velocity first
+        if (enableScaleInertia && (scaleVelocity.dx != 0 || scaleVelocity.dy != 0)) {
             /// Apply friction to velocity so the camera slows to a stop when user interaction ends.
-            scaleVelocity.x *= scaleInertia
-            scaleVelocity.y *= scaleInertia
+            scaleVelocity.dx *= scaleInertia
+            scaleVelocity.dy *= scaleInertia
             
             /// Stop the camera when velocity has approached close enough to zero
-            if (abs(scaleVelocity.x) < 0.001) { scaleVelocity.x = 0 }
-            if (abs(scaleVelocity.y) < 0.001) { scaleVelocity.y = 0 }
+            if (abs(scaleVelocity.dx) < 0.001) { scaleVelocity.dx = 0 }
+            if (abs(scaleVelocity.dy) < 0.001) { scaleVelocity.dy = 0 }
             
-            let newXScale = self.xScale - scaleVelocity.x
-            let newYScale = self.yScale - scaleVelocity.y
+            let newXScale = self.xScale - scaleVelocity.dx
+            let newYScale = self.yScale - scaleVelocity.dy
             
-            /// prevent the inertial zooming from exceeding the zoom limits
+            /// Prevent the inertial zooming from exceeding the zoom limits
             let clampedXScale = max(min(newXScale, maxScale), minScale)
             let clampedYScale = max(min(newYScale, maxScale), minScale)
             
@@ -595,7 +620,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
             self.yScale = clampedYScale
         }
         
-        /// reduce the load by checking the current scale velocity first
+        /// Reduce the load by checking the current scale velocity first
         if (enableRotationInertia && rotationVelocity != 0) {
             /// Apply friction to velocity so the camera slows to a stop when user interaction ends
             rotationVelocity *= rotationInertia
@@ -609,14 +634,50 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         }
     }
     
-    // MARK: Gesture recognizers
+    // MARK: didEvaluateActions
+    /**
+     
+     The camera protocol methods require this for proper tracking.
+     This method should be called by the didEvaluateActions method of the scene that instantiates the camera.
+     
+     */
+    func didEvaluateActions() {
+        
+        /// Manually trigger the property observers
+        if manuallyTriggerThePropertyObservers {
+            position = position
+            xScale = xScale
+            yScale = yScale
+            zRotation = zRotation
+        }
+    }
     
-    private func setupGestureRecognizers(view: SKView) {
+    // MARK: Touch
+    /**
+     
+     This method should be called by the touchesBegan event handler of the scene that instantiates the camera.
+     
+     */
+    func touchesBegan() {
+        stop()
+    }
+    
+    // MARK: Gesture Recognizers
+    
+    /// Allow multiple gesture recognizers to recognize gestures at the same time.
+    /// For this function to work, the protocol `UIGestureRecognizerDelegate` must be added to this class,
+    /// and a delegate must be set on the recognizer that needs to work with others
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
+    }
+    
+    func setupGestureRecognizers(gesturesView: UIView) {
         let panRecognizer = UIPanGestureRecognizer(target: self, action: #selector(panCamera(gesture:)))
         let pinchRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(scaleCamera(gesture:)))
         let rotationRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(rotateCamera(gesture:)))
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(resetCamera(gesture:)))
+        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap(gesture:)))
         
+        /// Delegates are set to allow simultaneous gesture recognition
         panRecognizer.delegate = self
         pinchRecognizer.delegate = self
         rotationRecognizer.delegate = self
@@ -625,28 +686,22 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         panRecognizer.maximumNumberOfTouches = 2
         tapRecognizer.numberOfTapsRequired = 2
         
-        /// this prevents the recognizer from cancelling touch events once a gesture is recognized
+        /// Prevent the recognizers from cancelling touch events once a gesture is recognized
         /// In UIKit, this property is set to true by default
         panRecognizer.cancelsTouchesInView = false
         pinchRecognizer.cancelsTouchesInView = false
         rotationRecognizer.cancelsTouchesInView = false
         tapRecognizer.cancelsTouchesInView = false
         
-        /// Allows touches ended event to fire immediately
+        /// Allow touchesEnded events to fire immediately
         tapRecognizer.delaysTouchesEnded = false
         tapRecognizer.delaysTouchesBegan = false
         
-        view.addGestureRecognizer(panRecognizer)
-        view.addGestureRecognizer(pinchRecognizer)
-        view.addGestureRecognizer(rotationRecognizer)
-        view.addGestureRecognizer(tapRecognizer)
-    }
-    
-    /// allow multiple gesture recognizers to recognize gestures at the same time
-    /// for this function to work, the protocol `UIGestureRecognizerDelegate` must be added to this class
-    /// and a delegate must be set on the recognizer that needs to work with others
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        return true
+        /// Attach the recognizers to the view
+        gesturesView.addGestureRecognizer(panRecognizer)
+        gesturesView.addGestureRecognizer(pinchRecognizer)
+        gesturesView.addGestureRecognizer(rotationRecognizer)
+        gesturesView.addGestureRecognizer(tapRecognizer)
     }
     
     /// Use this function to determine if gesture recognizers should be triggered
@@ -655,5 +710,27 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         /// for example, if some area is touched, return false to disable the gesture recognition
         /// for this camera, we disable the gestures if the `lock` property is false
         return !lock
+    }
+}
+
+/**
+ 
+ # Custom Pan Gesture Recognizer
+ 
+ By default, UIKit's pan gesture recognizer starts recognizing a pan after touches have moved across 10 points.
+ This sublcass of UIPanGestureRecognizer forces the recognition to happen immediately upon touchesMoved.
+ This cutsom class works, but the start up motion is not smooth. Need more work.
+ 
+ */
+class InstantPanGestureRecognizer: UIPanGestureRecognizer {
+    
+    /// Override the touchesMoved function to make it trigger immediately
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
+        super.touchesMoved(touches, with: event)
+        
+        /// Force the gesture recognizer to start recognizing the gesture immediately
+        if state == .possible {
+            state = .began
+        }
     }
 }

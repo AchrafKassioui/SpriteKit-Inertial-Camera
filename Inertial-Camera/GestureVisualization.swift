@@ -6,6 +6,16 @@
  For each of pan, pinch, and rotate gestures, it draws a circle at the finger position.
  Warning: the class setups its own gesture recognizers, independant from the camera's or any other recognizer in your view.
  
+ # Setup
+ 
+ The class is a sublcass of SKnode. So it adds that node to the scene, and inside it it displays visualization nodes.
+ 
+ ```
+ let gestureVisualization = GestureVisualizationLayer(scene: self)
+ addChild(gestureVisualization)
+ ```
+ 
+ 
  Achraf Kassioui
  Created: 15 April 2024
  Updated: 16 April 2024
@@ -14,7 +24,7 @@
 
 import SpriteKit
 
-class GestureVisualization: SKNode, UIGestureRecognizerDelegate {
+class GestureVisualizationLayer: SKNode, UIGestureRecognizerDelegate {
     
     /// variables
     private var gestureVisualizationNodes: [String: SKNode] = [:]
@@ -22,7 +32,8 @@ class GestureVisualization: SKNode, UIGestureRecognizerDelegate {
     private let myFontColor = SKColor(white: 0, alpha: 0.8)
     private let myStrokeColor = SKColor(white: 1, alpha: 0.8)
     private let circleRadius: CGFloat = 30
-    private let touchColor = SKColor(red: 10/255, green: 132/255, blue: 255/255, alpha: 0.8)
+    
+    private let touchColor = SKColor.systemRed
     
     /// initialization
     weak var parentScene: SKScene?
@@ -45,8 +56,6 @@ class GestureVisualization: SKNode, UIGestureRecognizerDelegate {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(visualizePanGesture(gesture:)))
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(visualizePinchGesture(gesture:)))
         let rotationGesture = UIRotationGestureRecognizer(target: self, action: #selector(visualizeRotationGesture(gesture:)))
-        
-        //panGesture.maximumNumberOfTouches = 2
         
         view.addGestureRecognizer(panGesture)
         view.addGestureRecognizer(pinchGesture)

@@ -8,20 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		DE020BED2BCDDA7200D897F8 /* GestureVisualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE020BEC2BCDDA7200D897F8 /* GestureVisualization.swift */; };
+		DE167A2E2D13E9BA00998303 /* Demo Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE167A2D2D13E9BA00998303 /* Demo Scene.swift */; };
 		DEB875192BC5EFC500A21BCB /* InertialCameraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */; };
-		DEB8751B2BC5EFC500A21BCB /* CameraDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB8751A2BC5EFC500A21BCB /* CameraDemo.swift */; };
 		DEB8751D2BC5EFC700A21BCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */; };
-		DEB875272BC5EFF900A21BCB /* InertialCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875262BC5EFF900A21BCB /* InertialCamera.swift */; };
+		DEB875272BC5EFF900A21BCB /* The Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875262BC5EFF900A21BCB /* The Camera.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		DE020BEC2BCDDA7200D897F8 /* GestureVisualization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureVisualization.swift; sourceTree = "<group>"; };
+		DE167A2D2D13E9BA00998303 /* Demo Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Demo Scene.swift"; sourceTree = "<group>"; };
 		DE288FB12BCA471C00A00644 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Inertial-Camera/Info.plist"; sourceTree = "<group>"; };
 		DEB875152BC5EFC500A21BCB /* Inertial Camera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Inertial Camera.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InertialCameraApp.swift; sourceTree = "<group>"; };
-		DEB8751A2BC5EFC500A21BCB /* CameraDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraDemo.swift; sourceTree = "<group>"; };
 		DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		DEB875262BC5EFF900A21BCB /* InertialCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InertialCamera.swift; sourceTree = "<group>"; };
+		DEB875262BC5EFF900A21BCB /* The Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "The Camera.swift"; sourceTree = "<group>"; };
 		DEB8752A2BC5FB5500A21BCB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -41,7 +41,6 @@
 			children = (
 				DE288FB12BCA471C00A00644 /* Info.plist */,
 				DEB8752A2BC5FB5500A21BCB /* README.md */,
-				DEB8752C2BC5FE2D00A21BCB /* Images */,
 				DEB875172BC5EFC500A21BCB /* Inertial-Camera */,
 				DEB875162BC5EFC500A21BCB /* Products */,
 			);
@@ -58,20 +57,13 @@
 		DEB875172BC5EFC500A21BCB /* Inertial-Camera */ = {
 			isa = PBXGroup;
 			children = (
-				DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */,
-				DEB8751A2BC5EFC500A21BCB /* CameraDemo.swift */,
-				DEB875262BC5EFF900A21BCB /* InertialCamera.swift */,
+				DEB875262BC5EFF900A21BCB /* The Camera.swift */,
+				DE167A2D2D13E9BA00998303 /* Demo Scene.swift */,
 				DE020BEC2BCDDA7200D897F8 /* GestureVisualization.swift */,
+				DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */,
 				DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */,
 			);
 			path = "Inertial-Camera";
-			sourceTree = "<group>";
-		};
-		DEB8752C2BC5FE2D00A21BCB /* Images */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Images;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,8 +135,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DEB875272BC5EFF900A21BCB /* InertialCamera.swift in Sources */,
-				DEB8751B2BC5EFC500A21BCB /* CameraDemo.swift in Sources */,
+				DEB875272BC5EFF900A21BCB /* The Camera.swift in Sources */,
+				DE167A2E2D13E9BA00998303 /* Demo Scene.swift in Sources */,
 				DE020BED2BCDDA7200D897F8 /* GestureVisualization.swift in Sources */,
 				DEB875192BC5EFC500A21BCB /* InertialCameraApp.swift in Sources */,
 			);
@@ -288,9 +280,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -302,7 +293,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -322,9 +313,8 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -336,7 +326,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

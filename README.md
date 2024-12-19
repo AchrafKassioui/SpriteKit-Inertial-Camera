@@ -2,7 +2,7 @@
 
 #  SpriteKit Inertial Camera
 
-This is a custom SpriteKit camera that you can use to navigate around the scene using multi-touch gestures. It supports pan, pinch, and rotate, as well as inertia on each transforms.
+This is a custom SpriteKit camera that you can use to navigate around the scene using multi-touch gestures. It supports pan, pinch, and rotate, as well as inertia on each transforms. Inertial Camera naturally shows SpriteKit as it is, i.e. an infinite canvas.
 
 ## Video
 
@@ -14,84 +14,89 @@ https://github.com/AchrafKassioui/SpriteKit-Inertial-Camera/assets/1216689/d0ff1
 
 ## Setup
 
-Add the `InertialCamera` file or class to your project, then create an instance of the camera and set it as the scene camera, for example inside `didMove`:
+Add the `InertialCamera` file or class to your project, then create an instance of the camera and set it as the scene camera, for example inside `didMove`. Note that the camera requires a view on which to setup the gesture recognizers. That view can be the SKView that renders the scene, or a parent UIView.
 
 ```swift
 override func didMove(to view: SKView) {
-    size = view.bounds.size
-    let inertialCamera = InertialCamera(scene: self)
-    camera = inertialCamera
+    let inertialCamera = InertialCamera()
+    inertialCamera.gesturesView = view
+    self.camera = inertialCamera
     addChild(inertialCamera)
 }
 ```
 
-In order to enable inertia, call the `updateInertia()` inside the scene `update`:
+Add the the camera's `update()` function inside the scene's `update`. This will simulate inertia.
 
 ```swift
 override func update(_ currentTime: TimeInterval) {
     if let inertialCamera = camera as? InertialCamera {
-        inertialCamera.updateInertia()
+        inertialCamera.update()
     }
 }
 ```
 
-## Configuration
-
-### Scene
-
-The scene object is optional during initialization, which allows to create an inertial camera object in a model without a reference to the scene. However, passing a scene is necessary to setup the gesture recognizers. You can initialize the camera without a scene, then pass a scene later through the `parentScene` property:
-
+Add the camera's `touchesBegan()` function inside the scene's' touchesBegan handler. This will stop the camera whenever the scene is touched.
 ```swift
-struct MyModel {
-    var myCamera = InertialCamera()
-}
-
-class myScene: SKScene {
-    var myModel = MyModel()
-    
-    override func didMove(to view: SKView) {
-        let inertialCamera = myModel.myCamera
-        inertialCamera.delegate = self
-        inertialCamera.parentScene = self
-        camera = inertialCamera
-        addChild(inertialCamera)
-    }
+override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    for touch in touches {
+        if let inertialCamera = camera as? InertialCamera {
+            inertialCamera.touchesBegan()
+        }
 }
 ```
 
-### Protocol
+## Protocol
 
-InertialCamera has a `InertialCameraDelegate` protocol that you can use to notify you of various camera changes. You implement the protocol like this:
+InertialCamera has a `InertialCameraDelegate` protocol that you can implement to notify you of various camera changes. First, add the protocol to the object that you want the camera to send messages to, and include the required protocol methods:
 
 ```swift
-/// Add the protocol to your scene declaration
-class myScene: SKScene, InertialCameraDelegate {
-
-    override func didMove(to view: SKView) {
-        let inertialCamera = InertialCamera(scene: self)
-        
-        /// Set the scene as delegate of the camera
-        inertialCamera.delegate = self
-        
-        camera = inertialCamera
-        addChild(inertialCamera)
-    }
-
-    /// Include the methods required by the protocol
-    
+class MyObject: InertialCameraDelegate {
     func cameraWillScale(to scale: (x: CGFloat, y: CGFloat)) {
-        /// Called before the camera is about to scale
+    
     }
-
+    
     func cameraDidScale(to scale: (x: CGFloat, y: CGFloat)) {
-        /// Called after the camera has scaled
+    
+    }
+    
+    func cameraDidMove(to position: CGPoint) {
+    
+    }
+    
+    func cameraDidRotate(to angle: CGFloat) {
+    
     }
 
-    func cameraDidMove(to position: CGPoint) {
-        /// Called after the camera has moved
-    }
 }
 ```
+
+Then, in the scene that instantiates the camera, make sure to call the camera’s `didEvaluateActions()` method inside the scene’s `didEvaluateActions()` override:
+
+```swift
+    override func didEvaluateActions() {
+        inertialCamera?.didEvaluateActions()
+    }
+```
+
+This is necessary because some camera methods use SKAction, and SKAction doesn’t automatically notify the camera of the transform changes it makes. Additional code is run after the actions have been evaluated, to keep the protocol functions up to date.
+
+## API
+
+If inertia is enabled and the camera update function is properly called, you can programmatically control the camera with these vector:
+
+```swift
+inertialCamera.positionVelocity = CGVector(dx: 0, dy: 0)
+inertialCamera.scaleVelocity = CGVector(dx: 0, dy: 0)
+inertialCamera.rotationVelocity: CGFloat = 0
+```
+
+You can stop ongoing camera inertia and internal actions with `stop()`.
+
+```swift
+inertialCamera.stop()
+```
+
+## Settings
 
 ### Inertia
 
@@ -114,22 +119,6 @@ inertialCamera.positionInertia = 0.95
 inertialCamera.scaleInertia = 0.75
 inertialCamera.rotationInertia = 0.85
 ```
-
-If inertia is enabled, programmatically change the camera's velocity:
-
-```swift
-inertialCamera.positionVelocity = (0, 0)
-inertialCamera.scaleVelocity = (0, 0)
-inertialCamera.rotationVelocity = 0
-```
-
-Stop all ongoing inertia. This is typically called by a `touchesBegan` event, so that the camera stops moving when the user touches the screen.
-
-```swift
-inertialCamera.stopInertia()
-```
-
-`stopInertia()` is a convenience method equivalent to setting all velocities to zero.
 
 ### Zoom
 
@@ -168,25 +157,12 @@ inertialCamera.setTo(
 )
 ```
 
-### Adaptive filtering
-
-Change the filtering mode of textures depending on camera zoom. When the scale is below 1 (zoom in) on either x or y, linear filtering on `SKSpriteNode` and anti-aliasing on `SKShapeNode` are disabled. When the scale is 1 or above (zoom out) on either x and y, linear filtering and anti-aliasing are enabled, which is the default renderer behavior.
-
-This is an opinionated feature. This behavior can be toggled:
-
-```swift
-inertialCamera.adaptiveFiltering = true
-```
-
-Note that in SpriteKit, filtering and anti-aliasing properties are only available on `SKTexture` and `SKShapeNode`. Other drawing nodes such as `SKLabelNode` or `SKEmitterNode` do not expose such properties.
-
 ## Compatibility
 
-Developed with Xcode 15 and tested on iOS 17.
+Developed with Xcode 15 and 16, and tested on iOS 17 and above.
 
 On macOS, although the panning works, the controls aren't yet adapted to the trackpad, mouse, and keyboard.
 
 ## Credits
 
 This project started as a fork of [SKCamera-Demo](https://github.com/HumboldtCodeClub/SKCamera-Demo). Thank you @HumboldtCodeClub for sharing and commenting your code.
-

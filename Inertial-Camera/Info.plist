@@ -2,12 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<string>true</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string>launch-background-color</string>
+		<string>launch_background_color</string>
 		<key>UIImageName</key>
-		<string>launch-screen</string>
+		<string>launch_screen</string>
 	</dict>
 </dict>
 </plist>
