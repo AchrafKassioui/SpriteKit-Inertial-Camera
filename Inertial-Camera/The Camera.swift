@@ -1,6 +1,6 @@
 /**
  
- # The Inertial Camera class
+ # SpriteKit Inertial Camera
  
  This is a custom SpriteKit camera that allows you to freely navigate around the scene using multi-touch gestures.
  You use pan, pinch, and rotate gestures to control the camera.
@@ -94,7 +94,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     /**
      
-     # Inertia Settings
+     # Inertia
      
      Values between 0 and 1. Lower values = higher friction.
      A value of 1 will perpetuate the motion indefinitely.
@@ -201,7 +201,6 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
      Unfinished.
      
      */
-    
     private var isIsometric = false
     private let isometricScaleMultiplier = 0.75
     private let isometricRotation = -45 * (CGFloat.pi / 180)
@@ -321,7 +320,6 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
      Currently broken.
      
      */
-    
     /// Children of this node will get adaptive texture filtering
     weak var adaptiveFilteringParent: SKNode? {
         didSet {
@@ -642,7 +640,6 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
      
      */
     func didEvaluateActions() {
-        
         /// Manually trigger the property observers
         if manuallyTriggerThePropertyObservers {
             position = position
@@ -720,6 +717,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
  By default, UIKit's pan gesture recognizer starts recognizing a pan after touches have moved across 10 points.
  This sublcass of UIPanGestureRecognizer forces the recognition to happen immediately upon touchesMoved.
  This cutsom class works, but the start up motion is not smooth. Need more work.
+ Inertial Camera uses the default UIPanGestureRecognizer.
  
  */
 class InstantPanGestureRecognizer: UIPanGestureRecognizer {

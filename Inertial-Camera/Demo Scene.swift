@@ -1,6 +1,6 @@
 /**
  
- # Learning UIKit
+ # Inertial Camera Demo Scene
  
  Achraf Kassioui
  Created 19 December 2024

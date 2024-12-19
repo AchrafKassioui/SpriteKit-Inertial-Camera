@@ -1,6 +1,6 @@
 /**
  
- # App entry point
+ # App Entry Point
  
  Achraf Kassioui
  Created: 9 April 2024
