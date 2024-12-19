@@ -31,7 +31,7 @@ override func update(_ currentTime: TimeInterval) {
 }
 ```
 
-Add the camera's `touchesBegan()` function inside the scene's' touchesBegan handler. This will stop the camera whenever the scene is touched.
+Add the camera's `touchesBegan()` function inside the scene's touchesBegan handler. This will stop the camera whenever the scene is touched.
 ```swift
 override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     for touch in touches {
