@@ -61,7 +61,7 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 
 You can send the camera to a position, scale, or rotation with an animation.
 If animated, the camera's position, rotation, and scale are applied in a specific order, depending on whether the camera is zooming in or out.
-The duration of the animation is picked within a range, depending on how much the camera has to change. These custom values can be teaked in the definition of the `setTo` function. 
+The duration of the animation is picked within a range, depending on how much the camera has to change. These custom values can be tweaked in the definition of the `setTo` function. 
 
 ```swift
 inertialCamera.setTo(
