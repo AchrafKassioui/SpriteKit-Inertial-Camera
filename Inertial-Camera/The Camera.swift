@@ -8,41 +8,10 @@
  
  Tested on iOS.
  
- ## Setup
- 
- - Include this class in your project.
- - Create an instance of InertialCamera.
- - Set the view that will receive gesture recognition. It could be the SKView or a parent UIView.
- - Set this camera as the scene camera.
- - Add the camera to the scene.
- 
- ```
- override func didMove(to view: SKView) {
-    let inertialCamera = InertialCamera()
-    inertialCamera.gesturesView = view
-    self.camera = inertialCamera
-    addChild(inertialCamera)
- }
- ```
- 
- 
- ## Inertia
- 
- You enable inertial panning, zooming, and rotating by calling the camera `update()` function from the update function of SKScene.
- 
- ```
- override func update(_ currentTime: TimeInterval) {
-    if let inertialCamera = camera as? InertialCamera {
-        inertialCamera.update()
-    }
- }
- ```
- 
  ## Challenges
  
  Implementing simulataneous pan and rotation has been a challenge. See: https://gist.github.com/AchrafKassioui/bd835b99a78e9ce29b08ce406896c59b
  The solution is to not rely on cumulative states stored when gesture has began. Instead, continuously reset the gesture value inside the changed state.
- 
  
  ## Author
  

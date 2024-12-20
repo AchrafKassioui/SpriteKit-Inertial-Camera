@@ -54,8 +54,7 @@ class PlaygroundViewController: UIViewController {
 
 class DemoScene: SKScene, InertialCameraDelegate {
     
-    var inertialCamera: InertialCamera?
-    
+    let inertialCamera = InertialCamera()
     let uiLayer = SKNode()
     let contentLayer = SKNode()
     
@@ -99,16 +98,15 @@ class DemoScene: SKScene, InertialCameraDelegate {
     // MARK: Setup Camera
     
     func setupCamera(view: UIView) {
-        inertialCamera = InertialCamera()
-        inertialCamera?.gesturesView = view
+        inertialCamera.gesturesView = view
         
         /// The camera delegate is the scene itself
         /// We will use the camera protocol to update the zoom UI
-        inertialCamera?.delegate = self
+        inertialCamera.delegate = self
         
         camera = inertialCamera
-        if let inertialCamera = inertialCamera { addChild(inertialCamera) }
-        inertialCamera?.zPosition = 1000
+        addChild(inertialCamera)
+        inertialCamera.zPosition = 1000
     }
     
     // MARK: Camera Protocol
@@ -329,13 +327,13 @@ class DemoScene: SKScene, InertialCameraDelegate {
     // MARK: Update
     
     override func update(_ currentTime: TimeInterval) {
-        inertialCamera?.update()
+        inertialCamera.update()
     }
     
     // MARK: didEvaluateActions
     
     override func didEvaluateActions() {
-        inertialCamera?.didEvaluateActions()
+        inertialCamera.didEvaluateActions()
     }
     
     // MARK: Touch
@@ -360,7 +358,7 @@ class DemoScene: SKScene, InertialCameraDelegate {
         for touch in touches {
             let touchedNodes = nodes(at: touch.location(in: self))
             
-            inertialCamera?.touchesBegan()
+            inertialCamera.touchesBegan()
             
             if let topNode = touchedNodes.max(by: { $0.zPosition > $1.zPosition }) {
                 if topNode.name == ButtonNames.cameraCurrentZoomlabel.rawValue || topNode.name == ButtonNames.cameraCurrentZoomButton.rawValue {
@@ -371,11 +369,11 @@ class DemoScene: SKScene, InertialCameraDelegate {
                         self?.hapticFeedback.impactOccurred(intensity: 1)
                     }
                     
-                    inertialCamera?.setTo(
-                        position: inertialCamera?.defaultPosition,
-                        xScale: inertialCamera?.defaultXScale,
-                        yScale: inertialCamera?.defaultYScale,
-                        rotation: inertialCamera?.defaultRotation
+                    inertialCamera.setTo(
+                        position: inertialCamera.defaultPosition,
+                        xScale: inertialCamera.defaultXScale,
+                        yScale: inertialCamera.defaultYScale,
+                        rotation: inertialCamera.defaultRotation
                     )
                 }
                 
@@ -383,16 +381,16 @@ class DemoScene: SKScene, InertialCameraDelegate {
                     animateButton(button: topNode)
                     
                     hapticFeedback.impactOccurred(intensity: 0.5)
-                    inertialCamera?.scaleVelocity.dx += 0.1
-                    inertialCamera?.scaleVelocity.dy += 0.1
+                    inertialCamera.scaleVelocity.dx += 0.1
+                    inertialCamera.scaleVelocity.dy += 0.1
                 }
                 
                 if topNode.name == ButtonNames.cameraZoomOutLabel.rawValue || topNode.name == ButtonNames.cameraZoomOutButton.rawValue {
                     animateButton(button: topNode)
                     
                     hapticFeedback.impactOccurred(intensity: 0.5)
-                    inertialCamera?.scaleVelocity.dx -= 0.1
-                    inertialCamera?.scaleVelocity.dy -= 0.1
+                    inertialCamera.scaleVelocity.dx -= 0.1
+                    inertialCamera.scaleVelocity.dy -= 0.1
                 }
             }
         }

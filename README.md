@@ -26,14 +26,17 @@ Alternatively, the demo scene is setup with Xcode live preview, which works with
 
 ## Setup the Camera
 
-Add the `InertialCamera` file or class to your project, then create an instance of the camera and set it as the scene camera, for example inside `didMove`. Note that the camera requires a view on which to setup the gesture recognizers. That view can be the SKView that renders the scene, or a parent UIView.
+Add the `InertialCamera` file or class to your project, then create an instance of the camera and set it as the scene camera. Note that the camera requires a view on which to setup the gesture recognizers. That view can be the SKView that renders the scene, or a parent UIView.
 
 ```swift
-override func didMove(to view: SKView) {
+class MyScene: SKScene {
     let inertialCamera = InertialCamera()
-    inertialCamera.gesturesView = view
-    self.camera = inertialCamera
-    addChild(inertialCamera)
+
+    override func didMove(to view: SKView) {
+        inertialCamera.gesturesView = view
+        addChild(inertialCamera)
+        camera = inertialCamera
+    }
 }
 ```
 
@@ -41,9 +44,7 @@ Add the the camera's `update()` function inside the scene's `update`. This will 
 
 ```swift
 override func update(_ currentTime: TimeInterval) {
-    if let inertialCamera = camera as? InertialCamera {
-        inertialCamera.update()
-    }
+    inertialCamera.update()
 }
 ```
 
@@ -51,9 +52,7 @@ Add the camera's `touchesBegan()` function inside the scene's touchesBegan handl
 ```swift
 override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     for touch in touches {
-        if let inertialCamera = camera as? InertialCamera {
-            inertialCamera.touchesBegan()
-        }
+        inertialCamera.touchesBegan()
     }
 }
 ```
