@@ -78,10 +78,10 @@ let inertialCamera = InertialCamera(
 )
 
 /// The transform values the camera was created with are stored in these properties
-inertialCamera.initPosition
-inertialCamera.initRotation
-inertialCamera.initXScale
-inertialCamera.initYScale
+inertialCamera.resetPosition 
+inertialCamera.resetRotation
+inertialCamera.resetXScale
+inertialCamera.resetYScale
 ```
 
 ### Animating the Camera
@@ -97,7 +97,7 @@ inertialCamera.setTo(
     withAnimation: Bool? = nil  /// Animate transitions (default is true).
 )
 
-/// Example: Zoom in without changing position or rotation
+/// Example: Zoom out without changing position or rotation
 inertialCamera.setTo(xScale: 2, yScale: 2)
 ```
 

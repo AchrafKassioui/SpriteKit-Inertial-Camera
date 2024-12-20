@@ -72,7 +72,7 @@ class DemoScene: SKScene, InertialCameraDelegate {
         
         if !contentCreated {
             setupCamera(view: view)
-            setupLayers()
+            setupLayers(withCamera: inertialCamera)
             
             createCameraZoomLabel(parent: uiLayer, view: view)
             createZoomInButton(parent: uiLayer, view: view)
@@ -89,8 +89,7 @@ class DemoScene: SKScene, InertialCameraDelegate {
         }
     }
     
-    func setupLayers() {
-        guard let camera = camera else { return }
+    func setupLayers(withCamera camera: SKCameraNode) {
         camera.addChild(uiLayer)
         addChild(contentLayer)
     }
@@ -370,10 +369,10 @@ class DemoScene: SKScene, InertialCameraDelegate {
                     }
                     
                     inertialCamera.setTo(
-                        position: inertialCamera.initPosition,
-                        xScale: inertialCamera.initXScale,
-                        yScale: inertialCamera.initYScale,
-                        rotation: inertialCamera.initRotation
+                        position: inertialCamera.resetPosition,
+                        xScale: inertialCamera.resetXScale,
+                        yScale: inertialCamera.resetYScale,
+                        rotation: inertialCamera.resetRotation
                     )
                 }
                 
