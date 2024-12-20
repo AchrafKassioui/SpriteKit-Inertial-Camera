@@ -39,6 +39,7 @@ class MyScene: SKScene {
     }
 }
 ```
+The camera requires a view for its gesture recognizers. Assign a view (such as the SKView rendering the scene or a parent UIView in your view controller) to the `gesturesView` property.
 
 2. Call the camera’s `update()` method in your scene’s update function to simulate inertia.
 
@@ -55,8 +56,6 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     inertialCamera.touchesBegan()
 }
 ```
-
-The camera requires a view for its gesture recognizers. Assign a view (such as the SKView rendering the scene or a parent UIView in your view controller) to the `gesturesView` property.
 
 ## API
 
