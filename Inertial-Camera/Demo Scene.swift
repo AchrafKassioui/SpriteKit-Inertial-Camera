@@ -43,10 +43,6 @@ class PlaygroundViewController: UIViewController {
         ])
         
         skView.presentScene(scene)
-        //skView.showsFPS = true
-        //skView.showsNodeCount = true
-        //skView.showsQuadCount = true
-        //skView.preferredFramesPerSecond = 120
     }
 }
 
@@ -56,7 +52,7 @@ class PlaygroundViewController: UIViewController {
 
 // MARK: - SpriteKit
 
-class DemoScene: SKScene {
+class DemoScene: SKScene, InertialCameraDelegate {
     
     var inertialCamera: InertialCamera?
     
@@ -74,7 +70,6 @@ class DemoScene: SKScene {
         view.contentMode = .center
         view.isMultipleTouchEnabled = true
         backgroundColor = .gray
-        physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         
         if !contentCreated {
             setupCamera(view: view)
@@ -95,27 +90,53 @@ class DemoScene: SKScene {
         }
     }
     
-    override func didChangeSize(_ oldSize: CGSize) {
-        super.didChangeSize(oldSize)
-        
-        if size != oldSize {
-            relayout()
-        }
+    func setupLayers() {
+        guard let camera = camera else { return }
+        camera.addChild(uiLayer)
+        addChild(contentLayer)
     }
+    
+    // MARK: Setup Camera
     
     func setupCamera(view: UIView) {
         inertialCamera = InertialCamera()
         inertialCamera?.gesturesView = view
+        
+        /// The camera delegate is the scene itself
+        /// We will use the camera protocol to update the zoom UI
+        inertialCamera?.delegate = self
         
         camera = inertialCamera
         if let inertialCamera = inertialCamera { addChild(inertialCamera) }
         inertialCamera?.zPosition = 1000
     }
     
-    func setupLayers() {
-        guard let camera = camera else { return }
-        camera.addChild(uiLayer)
-        addChild(contentLayer)
+    // MARK: Camera Protocol
+    
+    func cameraWillScale(to scale: (x: CGFloat, y: CGFloat)) {
+        updateCameraZoomLabel()
+    }
+    
+    func cameraDidScale(to scale: (x: CGFloat, y: CGFloat)) {
+        updateCameraZoomLabel()
+    }
+    
+    func cameraDidMove(to position: CGPoint) {
+        
+    }
+    
+    func cameraDidRotate(to angle: CGFloat) {
+        
+    }
+    
+    // MARK: didChangeSize
+    
+    override func didChangeSize(_ oldSize: CGSize) {
+        super.didChangeSize(oldSize)
+        
+        if size != oldSize {
+            relayout()
+        }
     }
     
     // MARK: Content
@@ -308,8 +329,7 @@ class DemoScene: SKScene {
     // MARK: Update
     
     override func update(_ currentTime: TimeInterval) {
-        inertialCamera?.update()        
-        updateCameraZoomLabel()
+        inertialCamera?.update()
     }
     
     // MARK: didEvaluateActions
@@ -331,6 +351,11 @@ class DemoScene: SKScene {
         ])
     ])
     
+    func animateButton(button: SKNode) {
+        button.removeAction(forKey: "buttonPressed")
+        button.run(buttonAction, withKey: "buttonPressed")
+    }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         for touch in touches {
             let touchedNodes = nodes(at: touch.location(in: self))
@@ -339,33 +364,35 @@ class DemoScene: SKScene {
             
             if let topNode = touchedNodes.max(by: { $0.zPosition > $1.zPosition }) {
                 if topNode.name == ButtonNames.cameraCurrentZoomlabel.rawValue || topNode.name == ButtonNames.cameraCurrentZoomButton.rawValue {
+                    animateButton(button: topNode)
+                    
                     hapticFeedback.impactOccurred(intensity: 1)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                         self?.hapticFeedback.impactOccurred(intensity: 1)
                     }
                     
-                    inertialCamera?.animateTo(position: .zero, xScale: 1, yScale: 1, rotation: 0)
-                    
-                    topNode.removeAction(forKey: "buttonPressed")
-                    topNode.run(buttonAction, withKey: "buttonPressed")
+                    inertialCamera?.setTo(
+                        position: inertialCamera?.defaultPosition,
+                        xScale: inertialCamera?.defaultXScale,
+                        yScale: inertialCamera?.defaultYScale,
+                        rotation: inertialCamera?.defaultRotation
+                    )
                 }
                 
                 if topNode.name == ButtonNames.cameraZoomInLabel.rawValue || topNode.name == ButtonNames.cameraZoomInButton.rawValue {
+                    animateButton(button: topNode)
+                    
                     hapticFeedback.impactOccurred(intensity: 0.5)
                     inertialCamera?.scaleVelocity.dx += 0.1
                     inertialCamera?.scaleVelocity.dy += 0.1
-                    
-                    topNode.removeAction(forKey: "buttonPressed")
-                    topNode.run(buttonAction, withKey: "buttonPressed")
                 }
                 
                 if topNode.name == ButtonNames.cameraZoomOutLabel.rawValue || topNode.name == ButtonNames.cameraZoomOutButton.rawValue {
+                    animateButton(button: topNode)
+                    
                     hapticFeedback.impactOccurred(intensity: 0.5)
                     inertialCamera?.scaleVelocity.dx -= 0.1
                     inertialCamera?.scaleVelocity.dy -= 0.1
-                    
-                    topNode.removeAction(forKey: "buttonPressed")
-                    topNode.run(buttonAction, withKey: "buttonPressed")
                 }
             }
         }

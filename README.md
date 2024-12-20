@@ -60,7 +60,24 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 
 ## API
 
-If inertia is enabled, you can programmatically control the camera with these values:
+You can send the camera to a position, scale, or rotation with an animation.
+If animated, the camera's position, rotation, and scale are applied in a specific order, depending on whether the camera is zooming in or out.
+The duration of the animation is picked within a range, depending on how much the camera has to change. These custom values can be teaked in the definition of the `setTo` function. 
+
+```swift
+inertialCamera.setTo(
+    position: CGPoint? = nil,
+    xScale: CGFloat? = nil,
+    yScale: CGFloat? = nil,
+    rotation: CGFloat? = nil,
+    withAnimation: Bool? = nil // Default is true
+)
+
+/// Example usage
+inertialCamera.setTo(xScale: 2, yScale: 2)
+```
+
+If inertia is enabled, you can programmatically control the camera. Each value is evaluated once per frame in the update method. The inertia simulation itself writes on these values.
 
 ```swift
 inertialCamera.positionVelocity = CGVector(dx: 0, dy: 0)
@@ -68,26 +85,17 @@ inertialCamera.scaleVelocity = CGVector(dx: 0, dy: 0)
 inertialCamera.rotationVelocity: CGFloat = 0
 ```
 
-You can stop ongoing inertia and internal actions with `stop()`.
+You can stop all internal transforms and actions with `stop()`.
 
 ```swift
 inertialCamera.stop()
 ```
 
-You can send the camera to a position, scale, or rotation with an animation. The animation positions, rotates, then scales the camera in a specific order, depending on whether the camera is zooming in or out. The duration of the animation is set within a specific range, depending on how far the camera has to travel. 
-
-```swift
-inertialCamera.animateTo(
-    position: CGPoint(x: 0, y: 0),
-    xScale: 1,
-    yScale: 1,
-    rotation: 0
-)
-```
-
 ## Protocol
 
-InertialCamera has a `InertialCameraDelegate` protocol that you can implement to notify you of various camera changes. First, add the protocol to the object that you want the camera to send messages to, and include the required protocol methods:
+The InertialCamera class provides a `InertialCameraDelegate` protocol that you can implement to receive notifications about various camera changes. A common use case for this protocol is to update the UI whenever the camera’s state changes. For example, in the demo scene, the zoom UI label is updated using the `cameraWillScale` and `cameraDidScale` protocol methods.
+
+To implement the protocol, you first conform your class to `InertialCameraDelegate` and define the required protocol methods:
 
 ```swift
 class MyObject: InertialCameraDelegate {
@@ -109,7 +117,7 @@ class MyObject: InertialCameraDelegate {
 }
 ```
 
-Then, in the scene that instantiates the camera, set the camera delegate property, and make sure to call the camera’s `didEvaluateActions()` method inside the scene’s `didEvaluateActions()` override:
+Next, in the scene where the InertialCamera is instantiated, set the delegate property of the camera to your object. Make sure to call the camera’s `didEvaluateActions()` method inside the scene's `didEvaluateActions()` override:
 
 ```swift
 class MyScene: SKScene {
@@ -125,7 +133,7 @@ class MyScene: SKScene {
 }
 ```
 
-We use didEvaluateActions because some camera methods use SKAction, and SKAction doesn’t automatically notify the camera of the transform changes it makes. Additional code is run after the actions have been evaluated, to keep the protocol functions up to date.
+The `didEvaluateActions` method is necessary because some of the camera’s transformations are performed using SKAction. However, [SKAction does not automatically notify the camera of changes it makes to the camera’s properties](https://developer.apple.com/documentation/spritekit/skaction/detecting_changes_at_each_step_of_an_animation) (e.g., position, scale, or rotation). By invoking `didEvaluateActions` after actions are evaluated, the camera can update its state and ensure that the delegate methods are called with the latest values.
 
 ## Settings
 
