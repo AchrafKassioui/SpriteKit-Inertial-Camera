@@ -198,9 +198,9 @@ inertialCamera.lock = false
 ### Inertia
 
 Inertia settings allow fine-tuning of how motion decays over time. Each transformation has its own decay factor:
-	•	1: no decay; motion continues indefinitely.
-	•	Greater than 1: causes exponential acceleration.
-	•	Negative values: unstable.
+- 1: no decay; motion continues indefinitely.
+- Greater than 1: causes exponential acceleration.
+- Negative values: unstable.
 
 ```swift
 /// Velocity is multiplied by this factor every frame. Default is `0.95`.
