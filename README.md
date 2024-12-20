@@ -76,7 +76,7 @@ inertialCamera.setTo(
 inertialCamera.setTo(xScale: 2, yScale: 2)
 ```
 
-If inertia is enabled, you can programmatically control the camera. Each value is evaluated once per frame in the update method. The inertia simulation itself writes on these values.
+If inertia is enabled, you can programmatically control the camera. Each of these value is evaluated once per frame in the `update()` method. The inertia simulation writes on these values.
 
 ```swift
 inertialCamera.positionVelocity = CGVector(dx: 0, dy: 0)
