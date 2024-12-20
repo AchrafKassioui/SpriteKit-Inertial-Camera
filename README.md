@@ -26,7 +26,7 @@ Alternatively, you can preview the demo scene without building or signing:
 
 ## Setup the Camera
 
-1. Include the InertialCamera file or class in your project. Then, create an instance of the camera and set it as the scene’s camera.
+1. Include the InertialCamera file or class in your project. Then, create an instance of the camera and set it as the scene’s camera. The camera requires a view for its gesture recognizers. Assign a view (such as the SKView rendering the scene or a parent UIView in your view controller) to the `gesturesView` property.
 
 ```swift
 class MyScene: SKScene {
@@ -39,8 +39,6 @@ class MyScene: SKScene {
     }
 }
 ```
-The camera requires a view for its gesture recognizers. Assign a view (such as the SKView rendering the scene or a parent UIView in your view controller) to the `gesturesView` property.
-
 2. Call the camera’s `update()` method in your scene’s update function to simulate inertia.
 
 ```swift
@@ -59,24 +57,38 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 
 ## API
 
-You can send the camera to a position, scale, or rotation with an animation.
-If animated, the camera's position, rotation, and scale are applied in a specific order, depending on whether the camera is zooming in or out.
-The duration of the animation is picked within a range, depending on how much the camera has to change. These custom values can be tweaked in the definition of the `setTo` function. 
+The camera supports initialization with specific default transforms:
+
+```swift
+/// Default camera position.
+inertialCamera.defaultPosition: CGPoint = .zero
+
+/// Default camera rotation.
+inertialCamera.defaultRotation: CGFloat = 0
+
+/// Default camera X scale.
+inertialCamera.defaultXScale: CGFloat = 1
+
+/// Default camera Y scale
+inertialCamera.defaultYScale: CGFloat = 1
+```
+
+The `setTo()` method animates the camera’s position, rotation, and scale. The order of animations depends on whether the camera is zooming in or out. The duration is dynamically determined based on the magnitude of the transformation, but these parameters can be customized in the `setTo()` method definition.
 
 ```swift
 inertialCamera.setTo(
-    position: CGPoint? = nil,
-    xScale: CGFloat? = nil,
-    yScale: CGFloat? = nil,
-    rotation: CGFloat? = nil,
-    withAnimation: Bool? = nil // Default is true
+    position: CGPoint? = nil,   /// Target position (optional).
+    xScale: CGFloat? = nil,     /// Target X scale (optional).
+    yScale: CGFloat? = nil,     /// Target Y scale (optional).
+    rotation: CGFloat? = nil,   /// Target rotation (optional, in radians).
+    withAnimation: Bool? = nil  /// Animate transitions (default is true).
 )
 
-/// Example usage
+/// Example: Zoom in without changing position or rotation
 inertialCamera.setTo(xScale: 2, yScale: 2)
 ```
 
-If inertia is enabled, you can programmatically control the camera. Each of these value is evaluated once per frame in the `update()` method. The inertia simulation writes on these values.
+If inertia is enabled, you can directly manipulate the camera’s motion by setting its velocities. These values are applied once per frame during the `update()` method. The inertia simulation writes on these values.
 
 ```swift
 inertialCamera.positionVelocity = CGVector(dx: 0, dy: 0)
@@ -84,7 +96,7 @@ inertialCamera.scaleVelocity = CGVector(dx: 0, dy: 0)
 inertialCamera.rotationVelocity: CGFloat = 0
 ```
 
-You can stop all internal transforms and actions with `stop()`.
+To immediately stop all camera transformations and animations, use the `stop()` method.
 
 ```swift
 inertialCamera.stop()
@@ -136,54 +148,70 @@ The `didEvaluateActions` method is necessary because some of the camera’s tran
 
 ## Settings
 
-```swift
-/// Scale works the opposite way of zoom.
-/// A higher zoom percentage corresponds to a lower value scale.
-/// Maximum zoom out. Default is 10, which is a 10% zoom.
-var maxScale: CGFloat = 10
-/// Maximum zoom in. Default is 0.25, which is a 400% zoom.
-var minScale: CGFloat = 0.25
+### Zoom
 
-/// Lock camera pan.
-var lockPan = false
-/// Lock camera scale.
-var lockScale = false
-/// Lock camera rotation.
-var lockRotation = false
-/// Lock the camera by stoping the gesture recogniziers from responding.
-var lock = false
+The camera uses scaling to control zoom. A higher zoom percentage corresponds to a lower scale value.
+
+```swift
+/// Maximum zoom out. Default is 10, which is a 10% zoom.
+inertialCamera.maxScale: CGFloat = 10
+
+/// Maximum zoom in. Default is 0.25, which is a 400% zoom.
+inertialCamera.minScale: CGFloat = 0.25
+```
+
+### Lock
+
+You can restrict camera transformations to lock panning, scaling, or rotation individually, or lock all gestures entirely.
+
+```swift
+/// Lock camera pan (disable movement).
+inertialCamera.lockPan = false
+
+/// Lock camera scale (disable zoom).
+inertialCamera.lockScale = false
+
+/// Lock camera rotation (disable rotation).
+inertialCamera.lockRotation = false
+
+/// Fully lock the camera by disabling gesture recognizers.
+inertialCamera.lock = false
+```
+
+### Inertia
+
+Inertia settings allow fine-tuning of how motion decays over time. Each transformation has its own decay factor:
+	•	1: no decay; motion continues indefinitely.
+	•	Greater than 1: causes exponential acceleration.
+	•	Negative values: unstable.
+
+```swift
+/// Velocity is multiplied by this factor every frame. Default is `0.95`.
+inertialCamera.positionInertia: CGFloat = 0.95
+
+/// Scale is multiplied by this factor every frame. Default is `0.75`.
+inertialCamera.scaleInertia: CGFloat = 0.75
+
+/// Rotation is multiplied by this factor every frame. Default is `0.85`.
+inertialCamera.rotationInertia: CGFloat = 0.85
 
 /// Toggle position inertia.
-var enablePanInertia = true
+inertialCamera.enablePanInertia = true
+
 /// Toggle scale inertia.
-var enableScaleInertia = true
+inertialCamera.enableScaleInertia = true
+
 /// Toggle rotation inertia.
-var enableRotationInertia = true
+inertialCamera.enableRotationInertia = true
+```
 
-/// Inertia factors for position, scale, and rotation.
-/// These factors determine how motion decays over time.
-/// - A value of `1`: no decay; motion continues indefinitely.
-/// - A value greater than `1`: causes exponential acceleration.
-/// - A negative value: unstable.
-/// Lower values = higher friction, resulting in faster decay of motion.
-/// Velocity is multiplied by this factor every frame. Default is `0.95`.
-var positionInertia: CGFloat = 0.95
-/// Scale is multiplied by this factor every frame. Default is `0.75`.
-var scaleInertia: CGFloat = 0.75
-/// Rotation is multiplied by this factor every frame. Default is `0.85`.
-var rotationInertia: CGFloat = 0.85
+### Double Tap
 
-/// Double tap the view to reset the camera to its default state.
-var doubleTapToReset = false
+You can enable a double-tap gesture to reset the camera to its default state.
 
-/// Default camera position.
-var defaultPosition: CGPoint = .zero
-/// Default camera rotation.
-var defaultRotation: CGFloat = 0
-/// Default camera X scale.
-var defaultXScale: CGFloat = 1
-/// Default camera Y scale
-var defaultYScale: CGFloat = 1
+```swift
+/// Enable double-tap to reset camera (default is `false`).
+inertialCamera.doubleTapToReset = false
 ```
 
 ## Compatibility
