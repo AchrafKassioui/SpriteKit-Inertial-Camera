@@ -4,11 +4,13 @@
 
 #  SpriteKit Inertial Camera
 
-A custom SpriteKit camera designed for smooth navigation around your scene using multi-touch gestures. It supports panning, pinching, and rotating, with inertia applied to each transformation.
+A custom SpriteKit camera designed for smooth navigation within your scene using multi-touch gestures. It supports panning, pinching, and rotating, with inertia applied to each transformation.
 
-The camera includes many settings and features that you can customize.
+The camera is highly customizable, offering a variety of settings and features.
 
-## Video
+## Demo
+
+Watch the demo video here:
 
 https://github.com/user-attachments/assets/7d9ecf50-3d83-4db7-8daf-7e3d60b40206
 
@@ -18,15 +20,17 @@ The project includes a demo app that you can compile and run on your device:
 - Download or clone this project.
 - Open the project in Xcode.
 - Update the project’s signing settings with your own credentials.
-- Choose a target (simulator or physical device) and run it with Command + R.
+- Select a target (simulator or physical device) and run the project (Command + R).
 
 Alternatively, you can preview the demo scene without building or signing:
 - Select the demo scene file in Xcode.
-- Open the Xcode canvas with Option + Command + Enter.
+- Open the Xcode canvas (Option + Command + Enter).
 
 ## Setup the Camera
 
-1. Include the InertialCamera file or class in your project. Then, create an instance of the camera and set it as the scene’s camera. The camera requires a view for its gesture recognizers. Assign a view (such as the SKView rendering the scene or a parent UIView in your view controller) to the `gesturesView` property.
+### 1. Add the Camera to Your Scene
+
+Import the `InertialCamera` class into your project, create an instance, and assign it as the scene’s camera. The camera requires a view for gesture recognition. Assign an SKView or parent UIView to the `gesturesView` property.
 
 ```swift
 class MyScene: SKScene {
@@ -39,7 +43,8 @@ class MyScene: SKScene {
     }
 }
 ```
-2. Call the camera’s `update()` method in your scene’s update function to simulate inertia.
+### 2. Update the Camera for Inertia
+Call the camera’s `update()` method in your scene’s update function to simulate inertia.
 
 ```swift
 override func update(_ currentTime: TimeInterval) {
@@ -47,7 +52,9 @@ override func update(_ currentTime: TimeInterval) {
 }
 ```
 
-3. Use the camera’s `touchesBegan()` function in your scene’s touchesBegan handler to stop the camera when the scene is touched.
+### 3. Handle Touch Events
+
+Call the camera’s `touchesBegan()` method in your touchesBegan handler to stop the camera when the scene is touched.
 
 ```swift
 override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -57,7 +64,9 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 
 ## API
 
-The camera supports initialization with specific default transforms:
+### Default Transforms
+
+The camera supports initialization with specific default transforms, which you can set before creating an InertialCamera instance.
 
 ```swift
 /// Default camera position.
@@ -73,7 +82,9 @@ inertialCamera.defaultXScale: CGFloat = 1
 inertialCamera.defaultYScale: CGFloat = 1
 ```
 
-The `setTo()` method animates the camera’s position, rotation, and scale. The order of animations depends on whether the camera is zooming in or out. The duration is dynamically determined based on the magnitude of the transformation, but these parameters can be customized in the `setTo()` method definition.
+### Animating the Camera
+
+The `setTo()` method animates the camera’s position, rotation, and scale. The order of animations depends on whether the camera is zooming in or out. The duration is dynamically determined based on the magnitude of the transformation. These parameters can be customized in the `setTo()` method definition inside the class.
 
 ```swift
 inertialCamera.setTo(
@@ -88,6 +99,8 @@ inertialCamera.setTo(
 inertialCamera.setTo(xScale: 2, yScale: 2)
 ```
 
+### Inertia Control
+
 If inertia is enabled, you can directly manipulate the camera’s motion by setting its velocities. These values are applied once per frame during the `update()` method. The inertia simulation writes on these values.
 
 ```swift
@@ -96,7 +109,7 @@ inertialCamera.scaleVelocity = CGVector(dx: 0, dy: 0)
 inertialCamera.rotationVelocity: CGFloat = 0
 ```
 
-To immediately stop all camera transformations and animations, use the `stop()` method.
+To stop all camera transformations and animations immediately, use `stop()`:
 
 ```swift
 inertialCamera.stop()
@@ -104,9 +117,11 @@ inertialCamera.stop()
 
 ## Protocol
 
-The InertialCamera class provides a `InertialCameraDelegate` protocol that you can implement to receive notifications about various camera changes. A common use case for this protocol is to update the UI whenever the camera’s state changes. For example, in the demo scene, the zoom UI label is updated using the `cameraWillScale` and `cameraDidScale` protocol methods.
+The `InertialCameraDelegate` protocol provides methods for tracking camera changes. A common use case is updating the UI when the camera’s state changes. For example, in the demo scene, the zoom UI label is updated using the `cameraWillScale` and `cameraDidScale` protocol methods.
 
-To implement the protocol, you first conform your class to `InertialCameraDelegate` and add the required protocol methods:
+### Implementation
+
+In the object where you want to listen to camera changes, conform to the `InertialCameraDelegate` protocol and implement its methods:
 
 ```swift
 class MyObject: InertialCameraDelegate {
@@ -128,7 +143,9 @@ class MyObject: InertialCameraDelegate {
 }
 ```
 
-Then, in the scene where the InertialCamera is instantiated, set the delegate property of the camera to your object. Make sure to call the camera’s `didEvaluateActions()` method inside the scene's didEvaluateActions override:
+### Setting the Delegate
+
+In the scene where the camera is instantiated, set the delegate property of the camera to your object, and make sure to call the camera’s `didEvaluateActions()` method:
 
 ```swift
 class MyScene: SKScene {
