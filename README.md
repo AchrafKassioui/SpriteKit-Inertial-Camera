@@ -91,65 +91,69 @@ You can stop ongoing camera inertia and internal actions with `stop()`.
 inertialCamera.stop()
 ```
 
-## Settings
-
-### Inertia
-
-Dynamically toggle inertia for each transform:
+You can send the camera to a position, scale, or rotation with an animation. The animation positions, scales, then rotates the camera in a specific order, depending on whether the camera is zooming in or out. The duration of the animation is set within a specific range, depending on how far the camera has to travel. 
 
 ```swift
-inertialCamera.enablePanInertia = true
-inertialCamera.enableScaleInertia = true
-inertialCamera.enableRotationInertia = true
-```
-
-Tweak the friction values:
-
-```swift
-/// lower values = higher friction
-/// a value of 1 will maintain the velocity indefinitely
-/// values above 1 will accelerate exponentially
-/// values below 1 are unstable
-inertialCamera.positionInertia = 0.95
-inertialCamera.scaleInertia = 0.75
-inertialCamera.rotationInertia = 0.85
-```
-
-### Zoom
-
-Set a minimum and maximum zoom level:
-
-```swift
-/// Zoom out to 10%
-inertialCamera.maxScale = 10
-/// Zoom in to 400%
-inertialCamera.minScale = 0.25
-```
-
-### Lock
-
-Dynamically lock each transform:
-
-```swift
-inertialCamera.lockPan = false
-inertialCamera.lockScale = false
-inertialCamera.lockRotation = false
-
-/// full lock, which disables gesture recognition
-inertialCamera.lock = false
-```
-
-### Set to
-
-Send the camera to a position, scale, and rotation with an animation:
-
-```swift
-inertialCamera.setTo(
+inertialCamera.animateTo(
     position: CGPoint(x: 0, y: 0),
     xScale: 1,
     yScale: 1,
     rotation: 0
 )
+```
+
+## Settings
+
+This camera has many settings that you can tweak, such as:
+
+```swift
+/// Scale works the opposite way of zoom.
+/// A higher zoom percentage corresponds to a lower value scale.
+/// Maximum zoom out. Default is 10, which is a 10% zoom.
+var maxScale: CGFloat = 10
+/// Maximum zoom in. Default is 0.25, which is a 400% zoom.
+var minScale: CGFloat = 0.25
+
+/// Lock camera pan.
+var lockPan = false
+/// Lock camera scale.
+var lockScale = false
+/// Lock camera rotation.
+var lockRotation = false
+/// Lock the camera by stoping the gesture recogniziers from responding.
+var lock = false
+
+/// Toggle position inertia.
+var enablePanInertia = true
+/// Toggle scale inertia.
+var enableScaleInertia = true
+/// Toggle rotation inertia.
+var enableRotationInertia = true
+
+/// Inertia factors for position, scale, and rotation.
+/// These factors determine how motion decays over time.
+/// - A value of `1`: no decay; motion continues indefinitely.
+/// - A value greater than `1`: causes exponential acceleration.
+/// - A negative value: unstable.
+/// Lower values = higher friction, resulting in faster decay of motion.
+/// Velocity is multiplied by this factor every frame. Default is `0.95`.
+var positionInertia: CGFloat = 0.95
+/// Scale is multiplied by this factor every frame. Default is `0.75`.
+var scaleInertia: CGFloat = 0.75
+/// Rotation is multiplied by this factor every frame. Default is `0.85`.
+var rotationInertia: CGFloat = 0.85
+
+/// Double tap the view to reset the camera to its default state.
+var doubleTapToReset = false
+
+/// Default camera position.
+var defaultPosition: CGPoint = .zero
+/// Default camera rotation.
+var defaultRotation: CGFloat = 0
+/// Default camera X scale.
+var defaultXScale: CGFloat = 1
+/// Default camera Y scale
+var defaultYScale: CGFloat = 1
 ```
 
 ## Compatibility

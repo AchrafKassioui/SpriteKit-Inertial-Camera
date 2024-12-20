@@ -344,7 +344,7 @@ class DemoScene: SKScene {
                         self?.hapticFeedback.impactOccurred(intensity: 1)
                     }
                     
-                    inertialCamera?.setTo(position: .zero, xScale: 1, yScale: 1, rotation: 0)
+                    inertialCamera?.animateTo(position: .zero, xScale: 1, yScale: 1, rotation: 0)
                     
                     topNode.removeAction(forKey: "buttonPressed")
                     topNode.run(buttonAction, withKey: "buttonPressed")

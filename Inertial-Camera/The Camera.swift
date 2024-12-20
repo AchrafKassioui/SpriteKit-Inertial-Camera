@@ -2,15 +2,15 @@
  
  # SpriteKit Inertial Camera
  
- This is a custom SpriteKit camera that allows you to freely navigate around the scene using multi-touch gestures.
+ This is a custom SpriteKit camera that allows you to navigate around the scene using multi-touch gestures.
  You use pan, pinch, and rotate gestures to control the camera.
  The camera includes inertia: at the end of each gesture, the velocity of the change is maintained then slowed down over time.
  
- Tested on iOS. Not adapted for macOS yet.
+ Tested on iOS.
  
  ## Setup
  
- - Include this file in your project.
+ - Include this class in your project.
  - Create an instance of InertialCamera.
  - Set the view that will receive gesture recognition. It could be the SKView or a parent UIView.
  - Set this camera as the scene camera.
@@ -48,7 +48,7 @@
  
  Achraf Kassioui
  Created: 8 April 2024
- Updated: 19 December 2024
+ Updated: 20 December 2024
  
  */
 
@@ -68,17 +68,11 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     // MARK: Settings
     
+    /// Scale works the opposite way of zoom. A higher zoom percentage corresponds to a lower value scale.
     /// Maximum zoom out. Default is 10, which is a 10% zoom.
     var maxScale: CGFloat = 10
     /// Maximum zoom in. Default is 0.25, which is a 400% zoom.
     var minScale: CGFloat = 0.25
-    
-    /// Toggle position inertia.
-    var enablePanInertia = true
-    /// Toggle scale inertia.
-    var enableScaleInertia = true
-    /// Toggle rotation inertia.
-    var enableRotationInertia = true
     
     /// Lock camera pan.
     var lockPan = false
@@ -89,34 +83,45 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     /// Lock the camera by stoping the gesture recogniziers from responding.
     var lock = false
     
-    /// Toggle double tap to reset position, scale, and rotation.
+    /// Toggle position inertia.
+    var enablePanInertia = true
+    /// Toggle scale inertia.
+    var enableScaleInertia = true
+    /// Toggle rotation inertia.
+    var enableRotationInertia = true
+    
+    /// Inertia factors for position, scale, and rotation.
+    /// These factors determine how motion decays over time.
+    /// - A value of `1`: no decay; motion continues indefinitely.
+    /// - A value greater than `1`: causes exponential acceleration.
+    /// - A negative value: unstable.
+    /// Lower values = higher friction, resulting in faster decay of motion.
+    /// Velocity is multiplied by this factor every frame. Default is `0.95`.
+    var positionInertia: CGFloat = 0.95
+    /// Scale is multiplied by this factor every frame. Default is `0.75`.
+    var scaleInertia: CGFloat = 0.75
+    /// Rotation is multiplied by this factor every frame. Default is `0.85`.
+    var rotationInertia: CGFloat = 0.85
+    
+    /// Double tap the view to reset the camera to its default state.
     var doubleTapToReset = false
     
-    /**
-     
-     # Inertia
-     
-     Values between 0 and 1. Lower values = higher friction.
-     A value of 1 will perpetuate the motion indefinitely.
-     Values more than 1 will accelerate exponentially. Negative values are unstable.
-     
-     */
-    /// Velocity is multiplied by this factor every frame. Default is 0.95
-    var positionInertia: CGFloat = 0.95
-    /// Scale is multiplied by this factor every frame. Default is 0.75
-    var scaleInertia: CGFloat = 0.75
-    /// Rotation is multiplied by this factor every frame. Default is 0.85
-    var rotationInertia: CGFloat = 0.85
+    /// Default camera position.
+    var defaultPosition: CGPoint = .zero
+    /// Default camera rotation.
+    var defaultRotation: CGFloat = 0
+    /// Default camera X scale.
+    var defaultXScale: CGFloat = 1
+    /// Default camera Y scale
+    var defaultYScale: CGFloat = 1
     
     /// Gesture changes that take longer than this duration in seconds will not trigger inertia.
     private var thresholdDurationForInertia: Double = 0.02
     
     // MARK: API
-    /**
-     
-     You can control the camera programmatically by setting these values manually.
-     
-     */
+    
+    /// The inertia simulation implemented by the update function writes on these values.
+    /// If inertia is enabled, the camera can be controlled programmatically by setting these values manually.
     /// The state of position velocity.
     var positionVelocity = CGVector(dx: 0, dy: 0)
     /// The state of scale velocity.
@@ -147,6 +152,18 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
                 setupGestureRecognizers(gesturesView: view)
             }
         }
+    }
+    
+    override init() {
+        super.init()
+        self.position = defaultPosition
+        self.zRotation = defaultRotation
+        self.xScale = defaultXScale
+        self.yScale = defaultYScale
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("InertialCamera: init(coder:) has not been implemented")
     }
     
     // MARK: Property Observers
@@ -222,7 +239,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         }
     }
     
-    // MARK: Set Camera
+    // MARK: Animate
     /**
      
      Animate the camera to a specific position, scale, and rotation.
@@ -231,7 +248,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     
     let actionName: String = "InertialCameraSetAction"
     
-    func setTo(position: CGPoint? = nil, xScale: CGFloat? = nil, yScale: CGFloat? = nil, rotation: CGFloat? = nil) {
+    func animateTo(position: CGPoint? = nil, xScale: CGFloat? = nil, yScale: CGFloat? = nil, rotation: CGFloat? = nil) {
         if position == nil && xScale == nil && yScale == nil && rotation == nil {
             return
         }
@@ -566,7 +583,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     @objc private func handleDoubleTap(gesture: UITapGestureRecognizer) {
         if lock || !doubleTapToReset { return }
         
-        self.setTo(position: .zero, xScale: 1, yScale: 1, rotation: 0)
+        self.animateTo(position: defaultPosition, xScale: defaultXScale, yScale: defaultYScale, rotation: defaultRotation)
     }
     
     // MARK: Update
