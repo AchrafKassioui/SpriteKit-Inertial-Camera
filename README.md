@@ -1,6 +1,6 @@
-<center>
+<p align="center">
 <img src="Images/SpriteKit-Inertial-Camera-Icon-Alpha.png" alt="SpriteKit-Inertial-Camera-Icon" style="width:25%;" />
-</center>
+</p>
 
 #  SpriteKit Inertial Camera
 
