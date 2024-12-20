@@ -112,14 +112,16 @@ class MyObject: InertialCameraDelegate {
 Then, in the scene that instantiates the camera, set the camera delegate property, and make sure to call the camera’s `didEvaluateActions()` method inside the scene’s `didEvaluateActions()` override:
 
 ```swift
-let myObject = MyObject()
+class MyScene: SKScene {
+    let myObject = MyObject()
 
-override func didMove(to view: SKView) {
-    inertialCamera.delegate = myObject
-}
+    override func didMove(to view: SKView) {
+        inertialCamera.delegate = myObject
+    }
 
-override func didEvaluateActions() {
-    inertialCamera.didEvaluateActions()
+    override func didEvaluateActions() {
+        inertialCamera.didEvaluateActions()
+    }
 }
 ```
 
