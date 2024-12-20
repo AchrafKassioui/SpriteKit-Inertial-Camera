@@ -15,20 +15,18 @@ https://github.com/user-attachments/assets/7d9ecf50-3d83-4db7-8daf-7e3d60b40206
 ## Run the Demo App
 
 The project includes a demo app that you can compile and run on your device:
-    1.	Download or clone this project.
-	2.	Open the project in Xcode.
-	3.	Update the project’s signing settings with your own credentials.
-	4.	Choose a target (simulator or physical device) and run it with Command + R.
+- Download or clone this project.
+- Open the project in Xcode.
+- Update the project’s signing settings with your own credentials.
+- Choose a target (simulator or physical device) and run it with Command + R.
 
 Alternatively, you can preview the demo scene without building or signing:
-	1.	Select the demo scene file in Xcode.
-	2.	Open the Xcode canvas with Option + Command + Enter.
+- Select the demo scene file in Xcode.
+- Open the Xcode canvas with Option + Command + Enter.
 
 ## Setup the Camera
 
-To use the InertialCamera in your project, follow these steps:
-1.	Add the Camera to Your Project
-Include the InertialCamera file or class in your project. Then, create an instance of the camera and set it as the scene’s camera.
+1. Include the InertialCamera file or class in your project. Then, create an instance of the camera and set it as the scene’s camera.
 
 ```swift
 class MyScene: SKScene {
@@ -42,8 +40,7 @@ class MyScene: SKScene {
 }
 ```
 
-2.	Update the Camera
-Call the camera’s update() method in your scene’s update() function to simulate inertia.
+2. Call the camera’s update() method in your scene’s update() function to simulate inertia.
 
 ```swift
 override func update(_ currentTime: TimeInterval) {
@@ -51,8 +48,8 @@ override func update(_ currentTime: TimeInterval) {
 }
 ```
 
-3.	Handle Touch Events
-Use the camera’s touchesBegan() function in your scene’s touchesBegan handler to stop the camera when the scene is touched.
+3. Use the camera’s touchesBegan() function in your scene’s touchesBegan handler to stop the camera when the scene is touched.
+
 ```swift
 override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     inertialCamera.touchesBegan()
@@ -60,7 +57,6 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 ```
 
 The camera requires a view for its gesture recognizers. Assign a view (such as the SKView rendering the scene or a parent UIView in your view controller) to the gesturesView property.
-This setup allows smooth camera interactions like panning, zooming, and inertia simulation.
 
 ## API
 
