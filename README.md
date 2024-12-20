@@ -125,7 +125,7 @@ class MyScene: SKScene {
 }
 ```
 
-This is necessary because some camera methods use SKAction, and SKAction doesn’t automatically notify the camera of the transform changes it makes. Additional code is run after the actions have been evaluated, to keep the protocol functions up to date.
+We use didEvaluateActions because some camera methods use SKAction, and SKAction doesn’t automatically notify the camera of the transform changes it makes. Additional code is run after the actions have been evaluated, to keep the protocol functions up to date.
 
 ## Settings
 
