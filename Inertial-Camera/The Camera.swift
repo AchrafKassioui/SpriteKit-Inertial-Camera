@@ -75,15 +75,14 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     /// Double tap the view to reset the camera to its default transforms.
     var doubleTapToReset = false
     
-    /// The camera is initialized with these transforms.
-    /// Default camera position.
-    var defaultPosition: CGPoint = .zero
-    /// Default camera rotation.
-    var defaultRotation: CGFloat = 0
-    /// Default camera X scale.
-    var defaultXScale: CGFloat = 1
-    /// Default camera Y scale
-    var defaultYScale: CGFloat = 1
+    /// The camera was initialized with this position.
+    var initPosition: CGPoint = .zero
+    /// The camera was initialized with this X scale.
+    var initXScale: CGFloat = 1
+    /// The camera was initialized with this Y scale.
+    var initYScale: CGFloat = 1
+    /// The camera was initialized with this rotation.
+    var initRotation: CGFloat = 0
     
     /// Gesture changes that take longer than this duration in seconds will not trigger inertia.
     private var thresholdDurationForInertia: Double = 0.02
@@ -104,16 +103,21 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         }
     }
     
-    override init() {
+    init(position: CGPoint = .zero, xScale: CGFloat = 1, yScale: CGFloat = 1, rotation: CGFloat = 0) {
         super.init()
+        
+        self.initPosition = position
+        self.initXScale = xScale
+        self.initYScale = yScale
+        self.initRotation = rotation
         
         /// We use the setTo method to assign the camera its default starting state, without animation.
         /// This method also triggers property observers, which notify the protocol methods.
         setTo(
-            position: defaultPosition,
-            xScale: defaultXScale,
-            yScale: defaultYScale,
-            rotation: defaultRotation,
+            position: initPosition,
+            xScale: initXScale,
+            yScale: initYScale,
+            rotation: initRotation,
             withAnimation: false
         )
     }
@@ -564,7 +568,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     @objc private func handleDoubleTap(gesture: UITapGestureRecognizer) {
         if lock || !doubleTapToReset { return }
         
-        self.setTo(position: defaultPosition, xScale: defaultXScale, yScale: defaultYScale, rotation: defaultRotation)
+        self.setTo(position: initPosition, xScale: initXScale, yScale: initYScale, rotation: initRotation)
     }
     
     // MARK: Update

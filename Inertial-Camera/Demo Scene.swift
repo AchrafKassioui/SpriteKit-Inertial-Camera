@@ -370,10 +370,10 @@ class DemoScene: SKScene, InertialCameraDelegate {
                     }
                     
                     inertialCamera.setTo(
-                        position: inertialCamera.defaultPosition,
-                        xScale: inertialCamera.defaultXScale,
-                        yScale: inertialCamera.defaultYScale,
-                        rotation: inertialCamera.defaultRotation
+                        position: inertialCamera.initPosition,
+                        xScale: inertialCamera.initXScale,
+                        yScale: inertialCamera.initYScale,
+                        rotation: inertialCamera.initRotation
                     )
                 }
                 
