@@ -4,13 +4,27 @@
 
 #  SpriteKit Inertial Camera
 
-This is a custom SpriteKit camera that you can use to navigate around the scene using multi-touch gestures. It supports pan, pinch, and rotate, as well as inertia on each transforms. Inertial Camera naturally shows SpriteKit as it is, i.e. an infinite canvas.
+A custom SpriteKit camera designed for smooth navigation around your scene using multi-touch gestures. It supports panning, pinching, and rotating, with inertia applied to each transformation. SpriteKit's scene becomes an infinite canvas.
+
+The camera includes many settings and features that you can customize.
 
 ## Video
 
 https://github.com/user-attachments/assets/7d9ecf50-3d83-4db7-8daf-7e3d60b40206
 
-## Setup
+## Run the Demo App
+
+The project comes with an app that you can compile and run on your device:
+- Download or clone this project.
+- Open with Xcode.
+- Change the project's signing to your own.
+- Choose a target, whether the simulator or a physical device, and run (Command + R).
+
+Alternatively, the demo scene is setup with Xcode live preview, which works without signing and running:
+- Select the demo scene file.
+- Open Xcode canvas (Option + Command + Enter).
+
+## Setup the Camera
 
 Add the `InertialCamera` file or class to your project, then create an instance of the camera and set it as the scene camera, for example inside `didMove`. Note that the camera requires a view on which to setup the gesture recognizers. That view can be the SKView that renders the scene, or a parent UIView.
 
@@ -40,46 +54,13 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let inertialCamera = camera as? InertialCamera {
             inertialCamera.touchesBegan()
         }
-}
-```
-
-## Protocol
-
-InertialCamera has a `InertialCameraDelegate` protocol that you can implement to notify you of various camera changes. First, add the protocol to the object that you want the camera to send messages to, and include the required protocol methods:
-
-```swift
-class MyObject: InertialCameraDelegate {
-    func cameraWillScale(to scale: (x: CGFloat, y: CGFloat)) {
-    
-    }
-    
-    func cameraDidScale(to scale: (x: CGFloat, y: CGFloat)) {
-    
-    }
-    
-    func cameraDidMove(to position: CGPoint) {
-    
-    }
-    
-    func cameraDidRotate(to angle: CGFloat) {
-    
     }
 }
 ```
-
-Then, in the scene that instantiates the camera, make sure to call the camera’s `didEvaluateActions()` method inside the scene’s `didEvaluateActions()` override:
-
-```swift
-override func didEvaluateActions() {
-    inertialCamera?.didEvaluateActions()
-}
-```
-
-This is necessary because some camera methods use SKAction, and SKAction doesn’t automatically notify the camera of the transform changes it makes. Additional code is run after the actions have been evaluated, to keep the protocol functions up to date.
 
 ## API
 
-If inertia is enabled and the camera update function is properly called, you can programmatically control the camera with these vector:
+If inertia is enabled, you can programmatically control the camera with these values:
 
 ```swift
 inertialCamera.positionVelocity = CGVector(dx: 0, dy: 0)
@@ -87,13 +68,13 @@ inertialCamera.scaleVelocity = CGVector(dx: 0, dy: 0)
 inertialCamera.rotationVelocity: CGFloat = 0
 ```
 
-You can stop ongoing camera inertia and internal actions with `stop()`.
+You can stop ongoing inertia and internal actions with `stop()`.
 
 ```swift
 inertialCamera.stop()
 ```
 
-You can send the camera to a position, scale, or rotation with an animation. The animation positions, scales, then rotates the camera in a specific order, depending on whether the camera is zooming in or out. The duration of the animation is set within a specific range, depending on how far the camera has to travel. 
+You can send the camera to a position, scale, or rotation with an animation. The animation positions, rotates, then scales the camera in a specific order, depending on whether the camera is zooming in or out. The duration of the animation is set within a specific range, depending on how far the camera has to travel. 
 
 ```swift
 inertialCamera.animateTo(
@@ -104,9 +85,47 @@ inertialCamera.animateTo(
 )
 ```
 
-## Settings
+## Protocol
 
-This camera has many settings that you can tweak, such as:
+InertialCamera has a `InertialCameraDelegate` protocol that you can implement to notify you of various camera changes. First, add the protocol to the object that you want the camera to send messages to, and include the required protocol methods:
+
+```swift
+class MyObject: InertialCameraDelegate {
+    func cameraWillScale(to scale: (x: CGFloat, y: CGFloat)) {
+        /// Handle pre-scaling logic here
+    }
+    
+    func cameraDidScale(to scale: (x: CGFloat, y: CGFloat)) {
+        /// Handle post-scaling logic here
+    }
+    
+    func cameraDidMove(to position: CGPoint) {
+        /// Handle camera move logic here
+    }
+    
+    func cameraDidRotate(to angle: CGFloat) {
+        /// Handle camera rotation logic here
+    }
+}
+```
+
+Then, in the scene that instantiates the camera, set the camera delegate property, and make sure to call the camera’s `didEvaluateActions()` method inside the scene’s `didEvaluateActions()` override:
+
+```swift
+let myObject = MyObject()
+
+override func didMove(to view: SKView) {
+    inertialCamera.delegate = myObject
+}
+
+override func didEvaluateActions() {
+    inertialCamera.didEvaluateActions()
+}
+```
+
+This is necessary because some camera methods use SKAction, and SKAction doesn’t automatically notify the camera of the transform changes it makes. Additional code is run after the actions have been evaluated, to keep the protocol functions up to date.
+
+## Settings
 
 ```swift
 /// Scale works the opposite way of zoom.
@@ -160,7 +179,7 @@ var defaultYScale: CGFloat = 1
 
 ## Compatibility
 
-Developed with Xcode 15 and 16, and tested on iOS 17 and above.
+Developed with Xcode 15 and 16. Tested on iOS 17 and 18.
 
 On macOS, although the panning works, the controls aren't yet adapted to the trackpad, mouse, and keyboard.
 
