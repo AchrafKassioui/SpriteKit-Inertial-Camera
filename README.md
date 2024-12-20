@@ -4,7 +4,7 @@
 
 #  SpriteKit Inertial Camera
 
-A custom SpriteKit camera designed for smooth navigation around your scene using multi-touch gestures. It supports panning, pinching, and rotating, with inertia applied to each transformation. SpriteKit's scene becomes an infinite canvas.
+A custom SpriteKit camera designed for smooth navigation around your scene using multi-touch gestures. It supports panning, pinching, and rotating, with inertia applied to each transformation.
 
 The camera includes many settings and features that you can customize.
 
