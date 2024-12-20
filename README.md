@@ -40,7 +40,7 @@ class MyScene: SKScene {
 }
 ```
 
-2. Call the camera’s update() method in your scene’s update() function to simulate inertia.
+2. Call the camera’s `update()` method in your scene’s update function to simulate inertia.
 
 ```swift
 override func update(_ currentTime: TimeInterval) {
@@ -48,7 +48,7 @@ override func update(_ currentTime: TimeInterval) {
 }
 ```
 
-3. Use the camera’s touchesBegan() function in your scene’s touchesBegan handler to stop the camera when the scene is touched.
+3. Use the camera’s `touchesBegan()` function in your scene’s touchesBegan handler to stop the camera when the scene is touched.
 
 ```swift
 override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -56,7 +56,7 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 }
 ```
 
-The camera requires a view for its gesture recognizers. Assign a view (such as the SKView rendering the scene or a parent UIView in your view controller) to the gesturesView property.
+The camera requires a view for its gesture recognizers. Assign a view (such as the SKView rendering the scene or a parent UIView in your view controller) to the `gesturesView` property.
 
 ## API
 
@@ -95,7 +95,7 @@ inertialCamera.stop()
 
 The InertialCamera class provides a `InertialCameraDelegate` protocol that you can implement to receive notifications about various camera changes. A common use case for this protocol is to update the UI whenever the camera’s state changes. For example, in the demo scene, the zoom UI label is updated using the `cameraWillScale` and `cameraDidScale` protocol methods.
 
-To implement the protocol, you first conform your class to `InertialCameraDelegate` and define the required protocol methods:
+To implement the protocol, you first conform your class to `InertialCameraDelegate` and add the required protocol methods:
 
 ```swift
 class MyObject: InertialCameraDelegate {
@@ -117,7 +117,7 @@ class MyObject: InertialCameraDelegate {
 }
 ```
 
-Next, in the scene where the InertialCamera is instantiated, set the delegate property of the camera to your object. Make sure to call the camera’s `didEvaluateActions()` method inside the scene's `didEvaluateActions()` override:
+Then, in the scene where the InertialCamera is instantiated, set the delegate property of the camera to your object. Make sure to call the camera’s `didEvaluateActions()` method inside the scene's didEvaluateActions override:
 
 ```swift
 class MyScene: SKScene {
@@ -133,7 +133,7 @@ class MyScene: SKScene {
 }
 ```
 
-The `didEvaluateActions` method is necessary because some of the camera’s transformations are performed using SKAction. However, [SKAction does not automatically notify the camera of changes it makes to the camera’s properties](https://developer.apple.com/documentation/spritekit/skaction/detecting_changes_at_each_step_of_an_animation) (e.g., position, scale, or rotation). By invoking `didEvaluateActions` after actions are evaluated, the camera can update its state and ensure that the delegate methods are called with the latest values.
+The `didEvaluateActions` method is necessary because some of the camera’s transformations are performed using SKAction. However, [SKAction does not automatically notify the camera of changes it makes to the camera’s properties](https://developer.apple.com/documentation/spritekit/skaction/detecting_changes_at_each_step_of_an_animation) (e.g., position, scale, or rotation). By invoking `didEvaluateActions()` after actions are evaluated, the camera can update its state and ensure that the delegate methods are called with the latest values.
 
 ## Settings
 
