@@ -17,7 +17,7 @@
  
  Achraf Kassioui
  Created: 8 April 2024
- Updated: 20 December 2024
+ Updated: 21 December 2024
  
  */
 
@@ -75,26 +75,22 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     /// Double tap the view to reset the camera to its default transforms.
     var doubleTapToReset = false
     
-    /// The camera was initialized with this position.
-    var resetPosition: CGPoint = .zero
-    /// The camera was initialized with this X scale.
-    var resetXScale: CGFloat = 1
-    /// The camera was initialized with this Y scale.
-    var resetYScale: CGFloat = 1
-    /// The camera was initialized with this rotation.
-    var resetRotation: CGFloat = 0
-    
     /// Gesture changes that take longer than this duration in seconds will not trigger inertia.
     private var thresholdDurationForInertia: Double = 0.02
     
     // MARK: Initialization
-    /**
-     
-     Creating the camera requires to pass in the view on which the gesture recognizers will be setup.
-     That view can be the SKView presenting the scene, or any UIView in the parent hierarchy of SKView.
-     
-     */
+    
+    /// Store a default camera position.
+    var defaultPosition: CGPoint
+    /// Store a default camera X scale.
+    var defaultXScale: CGFloat
+    /// Store a default camera Y scale.
+    var defaultYScale: CGFloat
+    /// Store a default camera rotation.
+    var defaultRotation: CGFloat
+    
     /// The view on which the camera gesture recognizers are setup.
+    /// This view can be the SKView presenting the scene, or any UIView in the parent hierarchy of SKView.
     weak var gesturesView: UIView? {
         didSet {
             if let view = gesturesView {
@@ -104,20 +100,20 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     }
     
     init(position: CGPoint = .zero, xScale: CGFloat = 1, yScale: CGFloat = 1, rotation: CGFloat = 0) {
+        self.defaultPosition = position
+        self.defaultXScale = xScale
+        self.defaultYScale = yScale
+        self.defaultRotation = rotation
+        
         super.init()
         
-        self.resetPosition = position
-        self.resetXScale = xScale
-        self.resetYScale = yScale
-        self.resetRotation = rotation
-        
-        /// We use the setTo method to assign the camera its default starting state, without animation.
-        /// This method also triggers property observers, which notify the protocol methods.
+        /// We use the setTo method to assign the camera its default starting state
+        /// This will triggers the property observers, and therefore the protocol methods.
         setTo(
-            position: resetPosition,
-            xScale: resetXScale,
-            yScale: resetYScale,
-            rotation: resetRotation,
+            position: defaultPosition,
+            xScale: defaultXScale,
+            yScale: defaultYScale,
+            rotation: defaultRotation,
             withAnimation: false
         )
     }
@@ -126,10 +122,58 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
         fatalError("InertialCamera: init(coder:) has not been implemented")
     }
     
-    // MARK: API
+    // MARK: Property Observers
+    /**
+     
+     The notifications for the camera protocol methods are made here.
+     
+     */
+    weak var delegate: InertialCameraDelegate?
     
-    /// The inertia simulation implemented by the update function writes on these values.
-    /// If inertia is enabled, the camera can be controlled programmatically by setting these values manually.
+    /// Some transform changes, such as those made with SKAction, do not trigger property observers.
+    /// https://developer.apple.com/documentation/spritekit/skaction/detecting_changes_at_each_step_of_an_animation
+    /// This tracking variable is used to manually set the transforms in the appropriate run loop, for example in didEvaluateActions.
+    private var manuallyTriggerThePropertyObservers: Bool = false
+    
+    override var position: CGPoint {
+        didSet {
+            delegate?.cameraDidMove(to: position)
+        }
+    }
+    
+    override var xScale: CGFloat {
+        willSet {
+            delegate?.cameraWillScale(to: (x: newValue, y: yScale))
+        }
+        didSet {
+            delegate?.cameraDidScale(to: (x: xScale, y: yScale))
+            updateFilteringMode()
+        }
+    }
+    
+    override var yScale: CGFloat {
+        willSet {
+            delegate?.cameraWillScale(to: (x: xScale, y: newValue))
+        }
+        didSet {
+            delegate?.cameraDidScale(to: (x: xScale, y: yScale))
+            updateFilteringMode()
+        }
+    }
+    
+    override var zRotation: CGFloat {
+        didSet {
+            delegate?.cameraDidRotate(to: zRotation)
+        }
+    }
+    
+    // MARK: API
+    /**
+     
+     If inertia is enabled, the camera can be controlled programmatically by setting these values manually.
+     The inertia simulation implemented by the update function writes on these values.
+     
+     */
     /// The state of position velocity.
     var positionVelocity = CGVector(dx: 0, dy: 0)
     /// The state of scale velocity.
@@ -137,21 +181,13 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     /// The state of rotation velocity.
     var rotationVelocity: CGFloat = 0
     
-    /// Stop all ongoing inertia and internal actions.
-    func stop() {
-        self.removeAction(forKey: actionName)
-        
-        positionVelocity = .zero
-        scaleVelocity = .zero
-        rotationVelocity = 0
-    }
     /**
      
      Set the camera to a specific position, scale, and rotation.
      If withAnimation is true (the default), the transforms are animated in a specific manner.
      
      */
-    let actionName: String = "InertialCameraSetAction"
+    private let actionName: String = UUID().uuidString
     
     func setTo(
         position: CGPoint? = nil,
@@ -229,53 +265,28 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
             }
         ])
         
-        /// Assign the action a key so it can be removed later
+        /// Run the action with a name so it can be removed later
         self.run(finalAnimationPlusCompletion, withKey: actionName)
     }
     
-    // MARK: Property Observers
-    /**
-     
-     The notifications for the camera protocol methods are made here.
-     
-     */
-    weak var delegate: InertialCameraDelegate?
-    
-    /// Some transform changes, such as those made with SKAction, do not trigger property observers.
-    /// https://developer.apple.com/documentation/spritekit/skaction/detecting_changes_at_each_step_of_an_animation
-    /// This tracking variable is used to manually set the transforms in the appropriate run loop, for example in didEvaluateActions.
-    private var manuallyTriggerThePropertyObservers: Bool = false
-    
-    override var xScale: CGFloat {
-        willSet {
-            delegate?.cameraWillScale(to: (x: newValue, y: yScale))
-        }
-        didSet {
-            delegate?.cameraDidScale(to: (x: xScale, y: yScale))
-            updateFilteringMode()
-        }
+    /// Stop all ongoing inertia and internal actions.
+    func stop() {
+        self.removeAction(forKey: actionName)
+        
+        positionVelocity = .zero
+        scaleVelocity = .zero
+        rotationVelocity = 0
     }
     
-    override var yScale: CGFloat {
-        willSet {
-            delegate?.cameraWillScale(to: (x: xScale, y: newValue))
-        }
-        didSet {
-            delegate?.cameraDidScale(to: (x: xScale, y: yScale))
-            updateFilteringMode()
-        }
-    }
-    
-    override var position: CGPoint {
-        didSet {
-            delegate?.cameraDidMove(to: position)
-        }
-    }
-    
-    override var zRotation: CGFloat {
-        didSet {
-            delegate?.cameraDidRotate(to: zRotation)
-        }
+    /// Convenience method to set the camera to its default transform values.
+    func reset(withAnimation: Bool = true) {
+        setTo(
+            position: defaultPosition,
+            xScale: defaultXScale,
+            yScale: defaultYScale,
+            rotation: defaultRotation,
+            withAnimation: withAnimation
+        )
     }
     
     // MARK: Adaptive filtering
@@ -568,7 +579,7 @@ class InertialCamera: SKCameraNode, UIGestureRecognizerDelegate {
     @objc private func handleDoubleTap(gesture: UITapGestureRecognizer) {
         if lock || !doubleTapToReset { return }
         
-        self.setTo(position: resetPosition, xScale: resetXScale, yScale: resetYScale, rotation: resetRotation)
+        self.setTo(position: defaultPosition, xScale: defaultXScale, yScale: defaultYScale, rotation: defaultRotation)
     }
     
     // MARK: Update

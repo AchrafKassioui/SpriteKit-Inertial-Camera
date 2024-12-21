@@ -64,9 +64,9 @@ override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
 
 ## API
 
-### Initialization Transforms
+### Default Transforms
 
-The camera supports initialization with specific transforms. You pass optional values during initialization:
+The camera is initialized with a default position, scale, and rotation. You can pass different values during initialization:
 
 ```swift
 /// Create the camera with specific transforms
@@ -78,10 +78,18 @@ let inertialCamera = InertialCamera(
 )
 
 /// The transform values the camera was created with are stored in these properties
-inertialCamera.resetPosition 
-inertialCamera.resetRotation
-inertialCamera.resetXScale
-inertialCamera.resetYScale
+inertialCamera.defaultPosition 
+inertialCamera.defaultRotation
+inertialCamera.defaultXScale
+inertialCamera.defaultYScale
+```
+
+Use `reset()` to restore all the default transforms:
+
+```swift
+inertialCamera.reset()
+/// Or pass an optional withAnimation parameter. Default is true
+inertialCamera.reset(withAnimation: true)
 ```
 
 ### Animating the Camera

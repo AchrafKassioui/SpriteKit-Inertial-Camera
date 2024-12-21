@@ -100,7 +100,7 @@ class DemoScene: SKScene, InertialCameraDelegate {
         inertialCamera.gesturesView = view
         
         /// The camera delegate is the scene itself
-        /// We will use the camera protocol to update the zoom UI
+        /// We use the camera protocol to update the zoom UI
         inertialCamera.delegate = self
         
         camera = inertialCamera
@@ -368,12 +368,7 @@ class DemoScene: SKScene, InertialCameraDelegate {
                         self?.hapticFeedback.impactOccurred(intensity: 1)
                     }
                     
-                    inertialCamera.setTo(
-                        position: inertialCamera.resetPosition,
-                        xScale: inertialCamera.resetXScale,
-                        yScale: inertialCamera.resetYScale,
-                        rotation: inertialCamera.resetRotation
-                    )
+                    inertialCamera.reset()
                 }
                 
                 if topNode.name == ButtonNames.cameraZoomInLabel.rawValue || topNode.name == ButtonNames.cameraZoomInButton.rawValue {
