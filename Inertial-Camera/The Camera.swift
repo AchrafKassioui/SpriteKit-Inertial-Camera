@@ -8,6 +8,10 @@
  
  Tested on iOS.
  
+ ## Documentation
+ 
+ https://github.com/AchrafKassioui/SpriteKit-Inertial-Camera
+ 
  ## Challenges
  
  Implementing simulataneous pan and rotation has been a challenge. See: https://gist.github.com/AchrafKassioui/bd835b99a78e9ce29b08ce406896c59b
