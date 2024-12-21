@@ -76,8 +76,11 @@ let inertialCamera = InertialCamera(
     yScale: 1,       /// Optional. Default is 1
     rotation: 0,     /// Optional. Default is 0
 )
+```
 
-/// The transform values the camera was created with are stored in these properties
+After initialization, you can set new defaults on these properties:
+
+```swift
 inertialCamera.defaultPosition 
 inertialCamera.defaultRotation
 inertialCamera.defaultXScale
@@ -111,7 +114,7 @@ inertialCamera.setTo(xScale: 2, yScale: 2)
 
 ### Inertia Control
 
-If inertia is enabled, you can directly manipulate the camera’s motion by setting its velocities. These values are applied once per frame during the `update()` method. The inertia simulation writes on these values.
+If inertia is enabled, you can programmatically manipulate the camera’s motion by setting its velocities. These values are applied once per frame during the `update()` method. The inertia simulation writes on these values.
 
 ```swift
 inertialCamera.positionVelocity = CGVector(dx: 0, dy: 0)
