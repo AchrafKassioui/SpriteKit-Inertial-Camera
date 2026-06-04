@@ -8,11 +8,9 @@ A custom SpriteKit camera designed for smooth navigation in your scene using mul
 
 The camera is highly customizable, offering a variety of settings and features.
 
-## Demo
+## Video
 
-Watch the demo video here:
-
-https://github.com/user-attachments/assets/7d9ecf50-3d83-4db7-8daf-7e3d60b40206
+https://github.com/user-attachments/assets/1346748e-84b0-4c6b-9de7-8e7f59447198
 
 ## Run the Demo App
 
