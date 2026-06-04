@@ -9,20 +9,22 @@
 /* Begin PBXBuildFile section */
 		DE020BED2BCDDA7200D897F8 /* GestureVisualization.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE020BEC2BCDDA7200D897F8 /* GestureVisualization.swift */; };
 		DE167A2E2D13E9BA00998303 /* Demo Scene.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE167A2D2D13E9BA00998303 /* Demo Scene.swift */; };
+		DE2238FF2DFA0B12009B61AC /* InertialCamera.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2238FE2DFA0B12009B61AC /* InertialCamera.swift */; };
 		DEB875192BC5EFC500A21BCB /* InertialCameraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */; };
 		DEB8751D2BC5EFC700A21BCB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */; };
-		DEB875272BC5EFF900A21BCB /* The Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEB875262BC5EFF900A21BCB /* The Camera.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		DE020BEC2BCDDA7200D897F8 /* GestureVisualization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GestureVisualization.swift; sourceTree = "<group>"; };
 		DE167A2D2D13E9BA00998303 /* Demo Scene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Demo Scene.swift"; sourceTree = "<group>"; };
+		DE2238FE2DFA0B12009B61AC /* InertialCamera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InertialCamera.swift; sourceTree = "<group>"; };
 		DE288FB12BCA471C00A00644 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Inertial-Camera/Info.plist"; sourceTree = "<group>"; };
 		DEB875152BC5EFC500A21BCB /* Inertial Camera.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Inertial Camera.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InertialCameraApp.swift; sourceTree = "<group>"; };
 		DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		DEB875262BC5EFF900A21BCB /* The Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "The Camera.swift"; sourceTree = "<group>"; };
 		DEB8752A2BC5FB5500A21BCB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		DECFC0382FD2037B00A05EAE /* NOTICE */ = {isa = PBXFileReference; lastKnownFileType = text; path = NOTICE; sourceTree = "<group>"; };
+		DECFC0392FD2037B00A05EAE /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +41,8 @@
 		DEB8750C2BC5EFC500A21BCB = {
 			isa = PBXGroup;
 			children = (
+				DECFC0382FD2037B00A05EAE /* NOTICE */,
+				DECFC0392FD2037B00A05EAE /* LICENSE */,
 				DE288FB12BCA471C00A00644 /* Info.plist */,
 				DEB8752A2BC5FB5500A21BCB /* README.md */,
 				DEB875172BC5EFC500A21BCB /* Inertial-Camera */,
@@ -57,11 +61,11 @@
 		DEB875172BC5EFC500A21BCB /* Inertial-Camera */ = {
 			isa = PBXGroup;
 			children = (
-				DEB875262BC5EFF900A21BCB /* The Camera.swift */,
 				DE167A2D2D13E9BA00998303 /* Demo Scene.swift */,
 				DE020BEC2BCDDA7200D897F8 /* GestureVisualization.swift */,
 				DEB875182BC5EFC500A21BCB /* InertialCameraApp.swift */,
 				DEB8751C2BC5EFC700A21BCB /* Assets.xcassets */,
+				DE2238FE2DFA0B12009B61AC /* InertialCamera.swift */,
 			);
 			path = "Inertial-Camera";
 			sourceTree = "<group>";
@@ -94,7 +98,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1530;
-				LastUpgradeCheck = 1530;
+				LastUpgradeCheck = 1640;
 				TargetAttributes = {
 					DEB875142BC5EFC500A21BCB = {
 						CreatedOnToolsVersion = 15.3;
@@ -135,10 +139,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DEB875272BC5EFF900A21BCB /* The Camera.swift in Sources */,
 				DE167A2E2D13E9BA00998303 /* Demo Scene.swift in Sources */,
 				DE020BED2BCDDA7200D897F8 /* GestureVisualization.swift in Sources */,
 				DEB875192BC5EFC500A21BCB /* InertialCameraApp.swift in Sources */,
+				DE2238FF2DFA0B12009B61AC /* InertialCamera.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -180,6 +184,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = G2XS6FMGZT;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -243,6 +248,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = G2XS6FMGZT;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -271,7 +277,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G2XS6FMGZT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Inertial-Camera/Info.plist";
@@ -304,7 +309,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G2XS6FMGZT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Inertial-Camera/Info.plist";

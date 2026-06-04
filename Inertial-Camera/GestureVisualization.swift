@@ -2,7 +2,7 @@
  
  # Gesture Visualization
  
- This class provides interaction feedback for user interaction.
+ This class provides visual feedback for user interaction.
  For each of pan, pinch, and rotate gestures, it draws a circle at the finger position.
  Warning: the class setups its own gesture recognizers, independant from the camera's or any other recognizer in your view.
  
@@ -26,16 +26,19 @@ import SpriteKit
 
 class GestureVisualizationLayer: SKNode, UIGestureRecognizerDelegate {
     
-    /// variables
-    private var gestureVisualizationNodes: [String: SKNode] = [:]
-    private let myFontName: String = "GillSans-SemiBold"
-    private let myFontColor = SKColor(white: 0, alpha: 0.8)
-    private let myStrokeColor = SKColor(white: 1, alpha: 0.8)
-    private let circleRadius: CGFloat = 30
+    // MARK: Properties
     
+    private var gestureVisualizationNodes: [String: SKNode] = [:]
+    private let fontName: String = "GillSans-SemiBold"
+    private let fontSize: CGFloat = 12
+    private let fontColor = SKColor(white: 0, alpha: 0.8)
+    private let strokeColor = SKColor(white: 0, alpha: 0.8)
+    private let lineWidth: CGFloat = 2
+    private let circleRadius: CGFloat = 22
     private let touchColor = SKColor.systemRed
     
-    /// initialization
+    // MARK: Init
+    
     weak var parentScene: SKScene?
     
     init(scene: SKScene) {
@@ -51,7 +54,8 @@ class GestureVisualizationLayer: SKNode, UIGestureRecognizerDelegate {
         fatalError("init(coder:) has not been implemented")
     }
     
-    /// gesture recognizers setup
+    // MARK: Gesture Recognizers
+    
     func setupGestureRecognizers(in view: SKView) {
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(visualizePanGesture(gesture:)))
         let pinchGesture = UIPinchGestureRecognizer(target: self, action: #selector(visualizePinchGesture(gesture:)))
@@ -128,16 +132,25 @@ class GestureVisualizationLayer: SKNode, UIGestureRecognizerDelegate {
             node.position = position
             adjustForCamera(node: node)
         } else {
-            let node = SKShapeNode(circleOfRadius: circleRadius)
-            node.name = name
-            node.fillColor = color
-            node.strokeColor = myStrokeColor
-            node.zPosition = 9999
-            node.position = position
-            adjustForCamera(node: node)
-            addChild(node)
+            let shape = SKShapeNode(circleOfRadius: circleRadius)
+            shape.name = name
+            shape.fillColor = color
+            shape.strokeColor = strokeColor
+            shape.lineWidth = lineWidth
+            shape.zPosition = 9999
+            shape.position = position
+            adjustForCamera(node: shape)
+            addChild(shape)
             
-            gestureVisualizationNodes[name] = node
+//            let label = SKLabelNode(text: name)
+//            label.fontSize = fontSize
+//            label.fontColor = fontColor
+//            label.verticalAlignmentMode = .center
+//            label.horizontalAlignmentMode = .center
+//            label.fontName = fontName
+//            shape.addChild(label)
+            
+            gestureVisualizationNodes[name] = shape
         }
     }
     

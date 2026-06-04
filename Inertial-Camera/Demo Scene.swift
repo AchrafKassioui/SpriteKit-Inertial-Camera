@@ -3,15 +3,16 @@
  # Inertial Camera Demo Scene
  
  Achraf Kassioui
- Created 19 December 2024
- Updated 19 December 2024
+ Created 19 Dec 2024
+ Updated 4 Jun 2024
  
  */
-
 import UIKit
+import SwiftUI
 import SpriteKit
+import CoreImage.CIFilterBuiltins
 
-// MARK: - UIKit
+// MARK: View Controller
 
 class PlaygroundViewController: UIViewController {
     
@@ -26,7 +27,23 @@ class PlaygroundViewController: UIViewController {
     let skView = SKView()
     let scene = DemoScene()
     
-    // MARK: View
+    // MARK: Title
+    
+    func createTitle() {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.textAlignment = .left
+        label.text = "Drag, Pinch, Rotate"
+        view.addSubview(label)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 18),
+            label.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 18)
+        ])
+    }
+    
+    // MARK: View Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -43,6 +60,9 @@ class PlaygroundViewController: UIViewController {
         ])
         
         skView.presentScene(scene)
+        
+        /// Title
+        createTitle()
     }
 }
 
@@ -50,72 +70,63 @@ class PlaygroundViewController: UIViewController {
     PlaygroundViewController()
 }
 
-// MARK: - SpriteKit
+// MARK: Scene
 
-class DemoScene: SKScene, InertialCameraDelegate {
+class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
+    
+    // MARK: Properties
     
     let inertialCamera = InertialCamera()
     let uiLayer = SKNode()
     let contentLayer = SKNode()
     
-    var contentCreated: Bool = false
-    
     let hapticFeedback = UIImpactFeedbackGenerator()
     
-    // MARK: Setup Scene
+    // MARK: Lifecycle
     
     override func didMove(to view: SKView) {
         scaleMode = .resizeFill
         view.contentMode = .center
         view.isMultipleTouchEnabled = true
         backgroundColor = .gray
+        anchorPoint = CGPoint(x: 0.5, y: 0.5)
         
-        if !contentCreated {
-            setupCamera(view: view)
-            setupLayers(withCamera: inertialCamera)
-            
-            createCameraZoomLabel(parent: uiLayer, view: view)
-            createZoomInButton(parent: uiLayer, view: view)
-            createZoomOutButton(parent: uiLayer, view: view)
-            hapticFeedback.prepare()
-            
-            createBackgroundTiles(parent: contentLayer)
-            createGridOfSprites(parent: contentLayer)
-            
-            let gestureVisualization = GestureVisualizationLayer(scene: self)
-            addChild(gestureVisualization)
-            
-            contentCreated = true
-        }
+        setupCamera(view: view)
+        setupLayers(withCamera: inertialCamera)
+        
+        createCameraZoomLabel(parent: uiLayer, view: view)
+        createZoomInButton(parent: uiLayer, view: view)
+        createZoomOutButton(parent: uiLayer, view: view)
+        hapticFeedback.prepare()
+        
+        createBackgroundTiles(parent: contentLayer)
+        //createGridOfSprites(parent: contentLayer)
+        
+        let gestureVisualization = GestureVisualizationLayer(scene: self)
+        addChild(gestureVisualization)
     }
     
-    func setupLayers(withCamera camera: SKCameraNode) {
-        camera.addChild(uiLayer)
-        addChild(contentLayer)
+    override func willMove(from view: SKView) {
+        removeAllChildren()
     }
     
-    // MARK: Setup Camera
+    // MARK: Camera
     
     func setupCamera(view: UIView) {
-        inertialCamera.gesturesView = view
-        
-        /// The camera delegate is the scene itself
-        /// We use the camera protocol to update the zoom UI
+        inertialCamera.gestureRecognizerDelegate = self
         inertialCamera.delegate = self
+        inertialCamera.gesturesView = view
+        inertialCamera.lock = false
+        inertialCamera.lockPan = false
+        inertialCamera.lockScale = false
+        inertialCamera.lockRotation = false
+        inertialCamera.doubleTapToReset = false
+        inertialCamera.maxScale = 10
+        inertialCamera.minScale = 0.1
         
-        camera = inertialCamera
-        addChild(inertialCamera)
+        self.camera = inertialCamera
         inertialCamera.zPosition = 1000
-    }
-    
-    // MARK: Camera Protocol
-    
-    func cameraWillScale(to scale: (x: CGFloat, y: CGFloat)) {
-        updateCameraZoomLabel()
-    }
-    
-    func cameraDidScale(to scale: (x: CGFloat, y: CGFloat)) {
-        updateCameraZoomLabel()
+        addChild(inertialCamera)
     }
     
     func cameraDidMove(to position: CGPoint) {
@@ -124,6 +135,10 @@ class DemoScene: SKScene, InertialCameraDelegate {
     
     func cameraDidRotate(to angle: CGFloat) {
         
+    }
+    
+    func cameraDidScale(to scale: CGPoint) {
+        updateCameraZoomLabel()
     }
     
     // MARK: didChangeSize
@@ -137,6 +152,11 @@ class DemoScene: SKScene, InertialCameraDelegate {
     }
     
     // MARK: Content
+    
+    func setupLayers(withCamera camera: SKCameraNode) {
+        camera.addChild(uiLayer)
+        addChild(contentLayer)
+    }
     
     func createGridOfSprites(parent: SKNode, gridSize: Int = 40, spriteSize: CGFloat = 65, spacing: CGFloat = 10) {
         let totalSize = CGFloat(gridSize) * (spriteSize + spacing) - spacing
@@ -159,7 +179,7 @@ class DemoScene: SKScene, InertialCameraDelegate {
     }
     
     func createBackgroundTiles(parent: SKNode) {
-        let texture = SKTexture(imageNamed: "checker_beige")
+        let texture = SKTexture(imageNamed: "Kenney_texture_08")
         
         let tileDefinition = SKTileDefinition(texture: texture)
         let tileGroup = SKTileGroup(tileDefinition: tileDefinition)
@@ -167,8 +187,8 @@ class DemoScene: SKScene, InertialCameraDelegate {
         
         let tileMap = SKTileMapNode(
             tileSet: tileSet,
-            columns: 20,
-            rows: 20,
+            columns: 50,
+            rows: 50,
             tileSize: texture.size()
         )
         
@@ -329,10 +349,14 @@ class DemoScene: SKScene, InertialCameraDelegate {
         inertialCamera.update()
     }
     
-    // MARK: didEvaluateActions
-    
     override func didEvaluateActions() {
         inertialCamera.didEvaluateActions()
+    }
+    
+    // MARK: Gesture Recognizer Delegate
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
     
     // MARK: Touch
@@ -357,7 +381,7 @@ class DemoScene: SKScene, InertialCameraDelegate {
         for touch in touches {
             let touchedNodes = nodes(at: touch.location(in: self))
             
-            inertialCamera.touchesBegan()
+            inertialCamera.stop()
             
             if let topNode = touchedNodes.max(by: { $0.zPosition > $1.zPosition }) {
                 if topNode.name == ButtonNames.cameraCurrentZoomlabel.rawValue || topNode.name == ButtonNames.cameraCurrentZoomButton.rawValue {
