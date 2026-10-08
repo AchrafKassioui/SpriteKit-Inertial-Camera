@@ -6,7 +6,7 @@
 
 A custom SpriteKit camera designed for smooth navigation in your scene using multi-touch gestures. It supports panning, pinching, and rotating, with inertia applied to each transformation.
 
-The camera is highly customizable, offering a variety of settings and features.
+The camera is highly customizable, offering a variety of settings and features. Visit [**the project web page**](https://www.achrafkassioui.com/spritekit-inertial-camera/).
 
 ## Video
 

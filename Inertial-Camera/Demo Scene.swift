@@ -4,7 +4,7 @@
  
  Achraf Kassioui
  Created 19 Dec 2024
- Updated 4 Jun 2024
+ Updated 8 Oct 2026
  
  */
 import UIKit
@@ -63,6 +63,7 @@ class PlaygroundViewController: UIViewController {
         /// Title
         createTitle()
     }
+    
 }
 
 #Preview() {
@@ -81,6 +82,12 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
     
     let hapticFeedback = UIImpactFeedbackGenerator()
     
+    /// Test floating point precision by placing the camera far from the scene origin.
+    /// Camera children nodes will jiggle when the camera is far and zoomed in.
+    /// See https://www.achrafkassioui.com/blog/spritekit-scene-size/
+    var testDistantCamera: Bool = true
+    let cameraDistantPosition = CGPoint(x: 10_000_000, y: 10_000_000)
+    
     // MARK: Lifecycle
     
     override func didMove(to view: SKView) {
@@ -96,13 +103,27 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
         createCameraZoomLabel(parent: uiLayer, view: view)
         createZoomInButton(parent: uiLayer, view: view)
         createZoomOutButton(parent: uiLayer, view: view)
+        createCameraPositionLabel(parent: uiLayer, view: view)
         hapticFeedback.prepare()
         
-        createBackgroundTiles(parent: contentLayer)
+        createBackgroundTiles(parent: contentLayer, at: .zero)
         //createGridOfSprites(parent: contentLayer)
         
         let gestureVisualization = GestureVisualizationLayer(scene: self)
         addChild(gestureVisualization)
+
+        if testDistantCamera {
+            createBackgroundTiles(parent: contentLayer, at: cameraDistantPosition)
+            let action = SKAction.sequence([
+                .wait(forDuration: 0.3),
+                SKAction.run { [weak self] in
+                    guard let self = self else { return }
+                    self.inertialCamera.setTo(position: cameraDistantPosition)
+                }
+            ])
+            
+            run(action)
+        }
     }
     
     override func willMove(from view: SKView) {
@@ -129,7 +150,7 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
     }
     
     func cameraDidMove(to position: CGPoint) {
-        
+        updateCameraPositionLabel()
     }
     
     func cameraDidRotate(to angle: CGFloat) {
@@ -146,6 +167,7 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
         super.didChangeSize(oldSize)
         
         if size != oldSize {
+            updateCameraPositionLabel()
             relayout()
         }
     }
@@ -177,7 +199,7 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
         }
     }
     
-    func createBackgroundTiles(parent: SKNode) {
+    func createBackgroundTiles(parent: SKNode, at position: CGPoint) {
         let texture = SKTexture(imageNamed: "Kenney_texture_08")
         
         let tileDefinition = SKTileDefinition(texture: texture)
@@ -192,12 +214,12 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
         )
         
         tileMap.fill(with: tileGroup)
-        tileMap.position = CGPoint(x: -0, y: 0)
+        tileMap.position = position
         
         parent.addChild(tileMap)
     }
     
-    // MARK: UI
+    // MARK: Create UI
     
     let viewMargin: CGFloat = 10
     let buttonSize = CGSize(width: 80, height: 50)
@@ -210,6 +232,19 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
         case cameraZoomInLabel = "cameraZoomInLabel"
         case cameraZoomOutButton = "cameraZoomOutButton"
         case cameraZoomOutLabel = "cameraZoomOutLabel"
+        case cameraPositionLabel = "cameraPositionLabel"
+    }
+    
+    func createCameraPositionLabel(parent: SKNode, view: SKView) {
+        let label = SKLabelNode()
+        label.name = ButtonNames.cameraPositionLabel.rawValue
+        label.fontName = "Menlo"
+        label.fontSize = 17
+        label.fontColor = .black
+        label.horizontalAlignmentMode = .center
+        label.verticalAlignmentMode = .center
+        label.zPosition = 2
+        parent.addChild(label)
     }
     
     func createCameraZoomLabel(parent: SKNode, view: SKView) {
@@ -300,7 +335,13 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
         button.addChild(label)
     }
     
-    // MARK: UI Layout
+    // MARK: Update UI
+    
+    func updateCameraPositionLabel() {
+        if let label = childNode(withName: "//\(ButtonNames.cameraPositionLabel.rawValue)") as? SKLabelNode {
+            label.text = "x: \(Int(inertialCamera.position.x)), y: \(Int(inertialCamera.position.y))"
+        }
+    }
     
     func updateCameraZoomLabel() {
         if let label = childNode(withName: "//\(ButtonNames.cameraCurrentZoomlabel.rawValue)") as? SKLabelNode, let camera = camera {
@@ -319,6 +360,13 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
         guard let view = view else { return }
         
         let bottomY = -view.bounds.height/2 + max(view.safeAreaInsets.bottom, viewMargin)
+        
+        if let cameraPositionLabel = childNode(withName: "//\(ButtonNames.cameraPositionLabel.rawValue)")as? SKLabelNode {
+            cameraPositionLabel.position = CGPoint(
+                x: 0,
+                y: bottomY + 70 + cameraPositionLabel.calculateAccumulatedFrame().height / 2
+            )
+        }
         
         if let cameraCurrentZoomButton = childNode(withName: "//\(ButtonNames.cameraCurrentZoomButton.rawValue)")as? SKSpriteNode {
             cameraCurrentZoomButton.position = CGPoint(
@@ -342,7 +390,7 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
         }
     }
     
-    // MARK: Update
+    // MARK: Run Loop
     
     override func update(_ currentTime: TimeInterval) {
         inertialCamera.update()
@@ -412,4 +460,5 @@ class DemoScene: SKScene, InertialCameraDelegate, UIGestureRecognizerDelegate {
             }
         }
     }
+    
 }
